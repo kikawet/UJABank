@@ -5,10 +5,15 @@
  */
 package es.ujaen.dae.ujabank.interfaces;
 
+import es.ujaen.dae.ujabank.DTO.DTOUsuario;
+
 /**
  *
  * @author axpos
  */
 public interface ServiciosUsuario {
     
+   public boolean registrar(DTOUsuario usuario);
+   public int login(DTOUsuario usuario);
+   public boolean crearCuenta(String token);
 }

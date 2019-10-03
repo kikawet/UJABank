@@ -9,6 +9,7 @@ package es.ujaen.dae.ujabank.interfaces;
  *
  * @author axpos
  */
-public interface Transaccion {
+public abstract class Transaccion {
     
+   private int cantidad;
 }

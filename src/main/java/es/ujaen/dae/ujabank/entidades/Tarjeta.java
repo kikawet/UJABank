@@ -5,10 +5,16 @@
  */
 package es.ujaen.dae.ujabank.entidades;
 
+import java.util.Date;
+
 /**
  *
  * @author axpos
  */
 public class Tarjeta {
     
+    private String titular;
+    private String numero;
+    private Date fCaducidad;
+    private String cvv;
 }

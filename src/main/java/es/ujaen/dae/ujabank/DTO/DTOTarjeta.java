@@ -5,10 +5,16 @@
  */
 package es.ujaen.dae.ujabank.DTO;
 
+import java.util.Date;
+
 /**
  *
  * @author axpos
  */
 public class DTOTarjeta {
     
+    private String titular;
+    private String numero;
+    private Date fCaducidad;
+    private String cvv;
 }

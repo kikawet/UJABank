@@ -5,10 +5,14 @@
  */
 package es.ujaen.dae.ujabank.entidades;
 
+import es.ujaen.dae.ujabank.interfaces.Transaccion;
+
 /**
  *
  * @author axpos
  */
-public class Retiro {
+public class Retiro extends Transaccion{
     
+    private Cuenta origen;
+    private Tarjeta destino;
 }
