@@ -8,22 +8,31 @@ package es.ujaen.dae.ujabank.beans;
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOTarjeta;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
+import es.ujaen.dae.ujabank.DTO.Mapper;
 import es.ujaen.dae.ujabank.entidades.Cuenta;
 import es.ujaen.dae.ujabank.entidades.Usuario;
 import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
 import es.ujaen.dae.ujabank.interfaces.Transaccion;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author axpos
  */
-public class Banco implements ServiciosTransacciones,ServiciosUsuario{
-    
+@Component
+public class Banco implements ServiciosTransacciones, ServiciosUsuario {
+
     private List<Usuario> usuariosBanco;
     private List<Cuenta> cuentasBANCO;
+
+    public Banco() {
+        this.usuariosBanco = new ArrayList<>();
+        this.cuentasBANCO = new ArrayList<>();
+    }
 
     @Override
     public boolean ingresar(String token, DTOTarjeta origen, DTOCuenta destino, int cantidad) {
@@ -46,12 +55,18 @@ public class Banco implements ServiciosTransacciones,ServiciosUsuario{
     }
 
     @Override
-    public boolean registrar(DTOUsuario usuario) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean registrar(DTOUsuario usuario,String contasena) {
+        Usuario u = Mapper.usuarioMapper(usuario);
+        u.setContrasena(contasena);
+        boolean insertado = false;
+        if (!this.usuariosBanco.contains(u)) {
+            insertado = this.usuariosBanco.add(u);
+        }
+        return insertado;
     }
 
     @Override
-    public int login(DTOUsuario usuario) {
+    public int login(DTOUsuario usuario,String contrasena) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -59,4 +74,4 @@ public class Banco implements ServiciosTransacciones,ServiciosUsuario{
     public boolean crearCuenta(String token) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
-   }
+}

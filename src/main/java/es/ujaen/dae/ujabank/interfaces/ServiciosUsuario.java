@@ -13,7 +13,7 @@ import es.ujaen.dae.ujabank.DTO.DTOUsuario;
  */
 public interface ServiciosUsuario {
     
-   public boolean registrar(DTOUsuario usuario);
-   public int login(DTOUsuario usuario);
+   public boolean registrar(DTOUsuario usuario,String contarasena);
+   public int login(DTOUsuario usuario,String contrasena);
    public boolean crearCuenta(String token);
 }
