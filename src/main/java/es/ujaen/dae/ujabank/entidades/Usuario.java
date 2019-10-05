@@ -6,6 +6,7 @@
 package es.ujaen.dae.ujabank.entidades;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -21,6 +22,7 @@ public class Usuario {
     private String telefono;
     private String email;
     private String contrasena;
+    private List<Cuenta> cuentas;
 
     @Override
     public int hashCode() {
@@ -105,4 +107,11 @@ public class Usuario {
         this.email = email;
     }
     
+    public boolean addCuenta(Cuenta c){
+        return this.cuentas.add(c);
+    }
+    
+    public boolean removeCuenta(Cuenta c){
+        return this.cuentas.remove(c);
+    }
 }

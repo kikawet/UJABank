@@ -14,4 +14,18 @@
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
+        <action>
+            <actionName>CUSTOM-install-rueda-library</actionName>
+            <displayName>install-rueda-library</displayName>
+            <goals>
+                <goal>install:install-file</goal>
+            </goals>
+            <properties>
+                <file>EuroUJACoinRate-1.0.jar</file>
+                <groupId>${packageClassName}</groupId>
+                <artifactId>${className}</artifactId>
+                <version>1.0</version>
+                <packaging>jar</packaging>
+            </properties>
+        </action>
     </actions>

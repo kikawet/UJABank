@@ -17,6 +17,10 @@ import es.ujaen.dae.ujabank.interfaces.Transaccion;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Set;
+import java.util.UUID;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,51 +31,89 @@ import org.springframework.stereotype.Component;
 public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
     private List<Usuario> usuariosBanco;
-    private List<Cuenta> cuentasBANCO;
+    private List<Cuenta> cuentasBanco;
+    private Map<UUID, Usuario> tokensActivos;
 
     public Banco() {
         this.usuariosBanco = new ArrayList<>();
-        this.cuentasBANCO = new ArrayList<>();
+        this.cuentasBanco = new ArrayList<>();
     }
 
     @Override
-    public boolean ingresar(String token, DTOTarjeta origen, DTOCuenta destino, int cantidad) {
+    public boolean ingresar(UUID token, DTOTarjeta origen, DTOCuenta destino, int cantidad) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean transferir(String token, DTOCuenta origen, DTOCuenta destino, int cantidad) {
+    public boolean transferir(UUID token, DTOCuenta origen, DTOCuenta destino, int cantidad) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean retirar(String token, DTOCuenta origen, DTOTarjeta destino, int cantidad) {
+    public boolean retirar(UUID token, DTOCuenta origen, DTOTarjeta destino, int cantidad) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public List<Transaccion> consultar(String token, DTOCuenta cuenta, Date inicio, Date fin) {
+    public List<Transaccion> consultar(UUID token, DTOCuenta cuenta, Date inicio, Date fin) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public boolean registrar(DTOUsuario usuario,String contasena) {
-        Usuario u = Mapper.usuarioMapper(usuario);
-        u.setContrasena(contasena);
+    public boolean registrar(DTOUsuario u, String contasena) {
+        Usuario usuario = Mapper.usuarioMapper(u);
+        usuario.setContrasena(contasena);
         boolean insertado = false;
-        if (!this.usuariosBanco.contains(u)) {
-            insertado = this.usuariosBanco.add(u);
+        if (!this.usuariosBanco.contains(usuario)) {
+            Cuenta cuenta = new Cuenta();
+            usuario.addCuenta(cuenta);
+            insertado = this.usuariosBanco.add(usuario) && this.cuentasBanco.add(cuenta);
+
+            if (!insertado) {
+                this.usuariosBanco.remove(usuario);
+                this.cuentasBanco.remove(cuenta);
+            }
         }
+
         return insertado;
     }
 
     @Override
-    public int login(DTOUsuario usuario,String contrasena) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public UUID login(DTOUsuario usuario, String contrasena) throws NoSuchElementException, IllegalAccessError {
+        int indiceUsuario = this.usuariosBanco.indexOf(Mapper.usuarioMapper(usuario));
+
+        if (indiceUsuario == -1) {
+            throw new NoSuchElementException("Ese usuario no está en el sistema");
+        }
+
+        if (this.usuariosBanco.get(indiceUsuario).getContrasena() == null ? contrasena == null : !this.usuariosBanco.get(indiceUsuario).getContrasena().equals(contrasena)) {
+            throw new IllegalAccessError("Contraseña incorrecta");
+        }
+
+        UUID token = UUID.randomUUID();
+
+        this.tokensActivos.put(token, this.usuariosBanco.get(indiceUsuario));
+
+        return token;
     }
 
     @Override
-    public boolean crearCuenta(String token) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean crearCuenta(UUID token) throws IllegalAccessError{
+        if(!this.tokensActivos.containsKey(token))
+            throw new IllegalAccessError("Token no existente");
+        
+        Usuario usuario = this.tokensActivos.get(token);
+        Cuenta cuenta = new Cuenta();
+        
+        boolean insertado = usuario.addCuenta(cuenta);
+        
+        if (insertado){
+            insertado = this.cuentasBanco.add(cuenta);
+            
+            if(!insertado)
+                usuario.removeCuenta(cuenta);
+        }
+        
+        return insertado;
     }
 }

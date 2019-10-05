@@ -23,5 +23,8 @@ public class UJABank {
         System.out.println("Servidor iniciado");
         
         Cliente.run(contexto);
+        
+        
+        
     }
 }

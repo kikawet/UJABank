@@ -7,6 +7,7 @@ package es.ujaen.dae.ujabank.cliente;
 
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
+import java.util.UUID;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -22,6 +23,8 @@ public class Cliente {
         usuario.setNombre("Pepe");
 
         System.out.println(banco.registrar(usuario,"DAE"));
+        
+        UUID r = banco.login(usuario, "DAE");
     }
 
 }
