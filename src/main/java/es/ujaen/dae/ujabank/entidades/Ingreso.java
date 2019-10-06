@@ -6,7 +6,6 @@
 package es.ujaen.dae.ujabank.entidades;
 
 import es.ujaen.dae.ujabank.interfaces.Transaccion;
-import java.util.logging.Logger;
 
 /**
  *

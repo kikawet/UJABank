@@ -11,5 +11,25 @@ package es.ujaen.dae.ujabank.DTO;
  */
 public class DTOCuenta {
 
-    private int cantidad;
+    private int _id;
+    private int _saldo;
+
+    public DTOCuenta() {
+    }
+
+    public int getId() {
+        return _id;
+    }
+
+    public void setId(int _id) {
+        this._id = _id;
+    }
+
+    public int getSaldo() {
+        return _saldo;
+    }
+
+    public void setSaldo(int _saldo) {
+        this._saldo = _saldo;
+    }
 }

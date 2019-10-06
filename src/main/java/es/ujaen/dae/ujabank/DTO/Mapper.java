@@ -16,6 +16,10 @@ import es.ujaen.dae.ujabank.entidades.Usuario;
 public class Mapper {
 
     public static Usuario usuarioMapper(DTOUsuario usuario) {
+        if (usuario == null) {
+            return null;
+        }
+
         Usuario u = new Usuario();
         u.setDni(usuario.getDni());
         u.setDomicilio(usuario.getDomicilio());
@@ -26,12 +30,38 @@ public class Mapper {
         return u;
     }
 
-    public static Cuenta cuentaMapper(DTOCuenta cuenta) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.      
+    public static Cuenta cuentaMapper(DTOCuenta dtoCuenta) {
+        if (dtoCuenta == null) {
+            return null;
+        }
+
+        Cuenta cuenta = new Cuenta(dtoCuenta.getSaldo());
+        cuenta.setId(dtoCuenta.getId());
+        return cuenta;
     }
 
-    public static Tarjeta tarjetaMapper(DTOTarjeta tarjeta) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.      
+    public static DTOCuenta dtoCuentaMapper(Cuenta cuenta) {
+        if (cuenta == null) {
+            return null;
+        }
+
+        DTOCuenta dtoCuenta = new DTOCuenta();
+        dtoCuenta.setId(cuenta.getSaldo());
+        dtoCuenta.setSaldo(cuenta.getSaldo());
+        return dtoCuenta;
+    }
+
+    public static Tarjeta tarjetaMapper(DTOTarjeta dtoTarjeta) {
+        if (dtoTarjeta == null) {
+            return null;
+        }
+
+        Tarjeta tarjeta = new Tarjeta();
+        tarjeta.setCvv(dtoTarjeta.getCvv());
+        tarjeta.setNumero(dtoTarjeta.getNumero());
+        tarjeta.setTitular(dtoTarjeta.getTitular());
+        tarjeta.setfCaducidad(dtoTarjeta.getfCaducidad());
+        return tarjeta;
     }
 
 }

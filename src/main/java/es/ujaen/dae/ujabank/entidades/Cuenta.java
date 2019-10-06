@@ -17,7 +17,7 @@ import java.util.List;
 public class Cuenta {
 
     private static int NUMERO_CUENTAS = 0;
-    private final int _id;
+    private int _id;
     private int _saldo;
 
     public int getSaldo() {
@@ -27,10 +27,14 @@ public class Cuenta {
     private List<Transaccion> _historial;
 
     public Cuenta() {
+        this(0);//llama a cuenta con saldo 0
+    }
+
+    public Cuenta(int saldo) {// si pongo el saldo en el constructor no necesitaré crear un setter
         this._id = NUMERO_CUENTAS;
         NUMERO_CUENTAS++;
 
-        this._saldo = 0;
+        this._saldo = saldo;
     }
 
     @Override
@@ -99,6 +103,14 @@ public class Cuenta {
         });
 
         return consulta;
+    }
+
+    public int getId() {
+        return _id;
+    }
+
+    public void setId(int _id) {
+        this._id = _id;
     }
 
 }

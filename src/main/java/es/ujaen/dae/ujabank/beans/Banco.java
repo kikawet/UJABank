@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Set;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 
@@ -231,7 +230,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     }
 
     @Override
-    public boolean crearCuenta(UUID token) throws IllegalAccessError {
+    public DTOCuenta crearCuenta(UUID token) throws IllegalAccessError {
         if (!this._tokensActivos.containsKey(token)) {
             throw new IllegalAccessError("Usuario no logeado");
         }
@@ -249,6 +248,6 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             }
         }
 
-        return insertado;
+        return Mapper.dtoCuentaMapper(cuenta);
     }
 }

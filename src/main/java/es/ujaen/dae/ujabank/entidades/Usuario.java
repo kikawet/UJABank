@@ -43,10 +43,7 @@ public class Usuario {
             return false;
         }
         final Usuario other = (Usuario) obj;
-        if (!Objects.equals(this._dni, other._dni)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this._dni, other._dni);
     }
 
     public String getContrasena() {
