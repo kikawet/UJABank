@@ -1,31 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
-        <action>
-            <actionName>run</actionName>
-            <packagings>
-                <packaging>jar</packaging>
-            </packagings>
-            <goals>
-                <goal>process-classes</goal>
-                <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
-            </goals>
-            <properties>
-                <exec.args>-classpath %classpath es.ujaen.dae.ujabank.UJABank</exec.args>
-                <exec.executable>java</exec.executable>
-            </properties>
-        </action>
-        <action>
-            <actionName>CUSTOM-install-rueda-library</actionName>
-            <displayName>install-rueda-library</displayName>
-            <goals>
-                <goal>install:install-file</goal>
-            </goals>
-            <properties>
-                <file>EuroUJACoinRate-1.0.jar</file>
-                <groupId>${packageClassName}</groupId>
-                <artifactId>${className}</artifactId>
-                <version>1.0</version>
-                <packaging>jar</packaging>
-            </properties>
-        </action>
-    </actions>
+    <action>
+        <actionName>run</actionName>
+        <packagings>
+            <packaging>jar</packaging>
+        </packagings>
+        <goals>
+            <goal>process-classes</goal>
+            <goal>org.codehaus.mojo:exec-maven-plugin:1.5.0:exec</goal>
+        </goals>
+        <properties>
+            <exec.args>-classpath %classpath es.ujaen.dae.ujabank.UJABank</exec.args>
+            <exec.executable>java</exec.executable>
+        </properties>
+    </action>
+    <action>
+        <actionName>CUSTOM-install-rueda-library</actionName>
+        <displayName>install-rueda-library</displayName>
+        <goals>
+            <goal>install:install-file</goal>
+        </goals>
+        <properties>
+            <file>EuroUJACoinRate-1.0.jar</file>                
+        </properties>
+    </action>
+</actions>

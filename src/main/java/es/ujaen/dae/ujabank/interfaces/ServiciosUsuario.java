@@ -13,8 +13,10 @@ import java.util.UUID;
  * @author axpos
  */
 public interface ServiciosUsuario {
-    
-   public boolean registrar(DTOUsuario usuario,String contarasena);
-   public UUID login(DTOUsuario usuario,String contrasena);
-   public boolean crearCuenta(UUID token);
+
+    public boolean registrar(DTOUsuario usuario, String contarasena);
+
+    public UUID login(DTOUsuario usuario, String contrasena);
+
+    public boolean crearCuenta(UUID token);
 }

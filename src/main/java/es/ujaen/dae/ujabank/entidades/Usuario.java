@@ -14,20 +14,20 @@ import java.util.Objects;
  * @author axpos
  */
 public class Usuario {
-    
-    private String nombre;
-    private String dni;
-    private String domicilio;
-    private Date fNacimiento;
-    private String telefono;
-    private String email;
-    private String contrasena;
-    private List<Cuenta> cuentas;
+
+    private String _nombre;
+    private String _dni;
+    private String _domicilio;
+    private Date _fNacimiento;
+    private String _telefono;
+    private String _email;
+    private String _contrasena;
+    private List<Cuenta> _cuentas;
 
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 17 * hash + Objects.hashCode(this.dni);
+        hash = 17 * hash + Objects.hashCode(this._dni);
         return hash;
     }
 
@@ -43,75 +43,77 @@ public class Usuario {
             return false;
         }
         final Usuario other = (Usuario) obj;
-        if (!Objects.equals(this.dni, other.dni)) {
+        if (!Objects.equals(this._dni, other._dni)) {
             return false;
         }
         return true;
     }
 
-    
-    
     public String getContrasena() {
-        return contrasena;
+        return _contrasena;
     }
 
     public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
+        this._contrasena = contrasena;
     }
 
     public String getNombre() {
-        return nombre;
+        return _nombre;
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        this._nombre = nombre;
     }
 
     public String getDni() {
-        return dni;
+        return _dni;
     }
 
     public void setDni(String dni) {
-        this.dni = dni;
+        this._dni = dni;
     }
 
     public String getDomicilio() {
-        return domicilio;
+        return _domicilio;
     }
 
     public void setDomicilio(String domicilio) {
-        this.domicilio = domicilio;
+        this._domicilio = domicilio;
     }
 
     public Date getfNacimiento() {
-        return fNacimiento;
+        return _fNacimiento;
     }
 
     public void setfNacimiento(Date fNacimiento) {
-        this.fNacimiento = fNacimiento;
+        this._fNacimiento = fNacimiento;
     }
 
     public String getTelefono() {
-        return telefono;
+        return _telefono;
     }
 
     public void setTelefono(String telefono) {
-        this.telefono = telefono;
+        this._telefono = telefono;
     }
 
     public String getEmail() {
-        return email;
+        return _email;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this._email = email;
     }
-    
-    public boolean addCuenta(Cuenta c){
-        return this.cuentas.add(c);
+
+    public boolean addCuenta(Cuenta c) {
+        return this._cuentas.add(c);
     }
-    
-    public boolean removeCuenta(Cuenta c){
-        return this.cuentas.remove(c);
+
+    public boolean removeCuenta(Cuenta c) {
+        return this._cuentas.remove(c);
+    }
+
+    public boolean containsCuenta(Cuenta c) {
+        return this._cuentas.contains(c);
     }
 }

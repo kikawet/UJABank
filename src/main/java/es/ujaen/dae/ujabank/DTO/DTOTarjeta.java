@@ -12,9 +12,9 @@ import java.util.Date;
  * @author axpos
  */
 public class DTOTarjeta {
-    
-    private String titular;
-    private String numero;
-    private Date fCaducidad;
-    private String cvv;
+
+    private String _titular;
+    private String _numero;
+    private Date _fCaducidad;
+    private String _cvv;
 }

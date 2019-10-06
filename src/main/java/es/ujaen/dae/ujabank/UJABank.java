@@ -16,15 +16,14 @@ import org.springframework.context.ApplicationContext;
  */
 @SpringBootApplication(scanBasePackages = "es.ujaen.dae.ujabank.beans")
 public class UJABank {
+
     public static void main(String[] args) throws Exception {
-        SpringApplication servidor = new SpringApplication(UJABank.class);       
+        SpringApplication servidor = new SpringApplication(UJABank.class);
         ApplicationContext contexto = servidor.run(args);
-        
+
         System.out.println("Servidor iniciado");
-        
+
         Cliente.run(contexto);
-        
-        
-        
+
     }
 }

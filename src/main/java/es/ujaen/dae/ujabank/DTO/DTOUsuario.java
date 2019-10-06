@@ -12,62 +12,60 @@ import java.util.Date;
  * @author axpos
  */
 public class DTOUsuario {
-    
-    private String nombre;
-    private String dni;
-    private String domicilio;
-    private Date fNacimiento;
-    private String telefono;
-    private String email;
+
+    private String _nombre;
+    private String _dni;
+    private String _domicilio;
+    private Date _fNacimiento;
+    private String _telefono;
+    private String _email;
 
     public String getNombre() {
-        return nombre;
+        return _nombre;
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        this._nombre = nombre;
     }
 
     public String getDni() {
-        return dni;
+        return _dni;
     }
 
     public void setDni(String dni) {
-        this.dni = dni;
+        this._dni = dni;
     }
 
     public String getDomicilio() {
-        return domicilio;
+        return _domicilio;
     }
 
     public void setDomicilio(String domicilio) {
-        this.domicilio = domicilio;
+        this._domicilio = domicilio;
     }
 
     public Date getfNacimiento() {
-        return fNacimiento;
+        return _fNacimiento;
     }
 
     public void setfNacimiento(Date fNacimiento) {
-        this.fNacimiento = fNacimiento;
+        this._fNacimiento = fNacimiento;
     }
 
     public String getTelefono() {
-        return telefono;
+        return _telefono;
     }
 
     public void setTelefono(String telefono) {
-        this.telefono = telefono;
+        this._telefono = telefono;
     }
 
     public String getEmail() {
-        return email;
+        return _email;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this._email = email;
     }
-    
-    
-    
+
 }

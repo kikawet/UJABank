@@ -19,7 +19,7 @@ public interface ServiciosTransacciones {
 
     public boolean ingresar(UUID token, DTOTarjeta origen, DTOCuenta destino, int cantidad);
 
-    public boolean transferir(UUID token, DTOCuenta origen, DTOCuenta destino, int cantidad);
+    public boolean transferir(UUID token, DTOCuenta origen, DTOCuenta destino, int cantidad, String concepto);
 
     public boolean retirar(UUID token, DTOCuenta origen, DTOTarjeta destino, int cantidad);
 

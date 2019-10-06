@@ -14,25 +14,24 @@ import es.ujaen.dae.ujabank.entidades.Usuario;
  * @author lopez
  */
 public class Mapper {
-    
-    public static Usuario usuarioMapper(DTOUsuario usuario){
+
+    public static Usuario usuarioMapper(DTOUsuario usuario) {
         Usuario u = new Usuario();
         u.setDni(usuario.getDni());
         u.setDomicilio(usuario.getDomicilio());
         u.setEmail(usuario.getEmail());
         u.setNombre(usuario.getNombre());
         u.setTelefono(usuario.getTelefono());
-        u.setfNacimiento(usuario.getfNacimiento());        
-        return u;        
+        u.setfNacimiento(usuario.getfNacimiento());
+        return u;
     }
-    
-    public static Cuenta cuentaMapper(DTOCuenta cuenta){
+
+    public static Cuenta cuentaMapper(DTOCuenta cuenta) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.      
     }
-    
-    public static Tarjeta tarjetaMapper(DTOTarjeta tarjeta){
+
+    public static Tarjeta tarjetaMapper(DTOTarjeta tarjeta) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.      
     }
-    
-    
+
 }

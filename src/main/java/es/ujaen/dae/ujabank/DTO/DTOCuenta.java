@@ -10,5 +10,6 @@ package es.ujaen.dae.ujabank.DTO;
  * @author axpos
  */
 public class DTOCuenta {
-    
+
+    private int cantidad;
 }

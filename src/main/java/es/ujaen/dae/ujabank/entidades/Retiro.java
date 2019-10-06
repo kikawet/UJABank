@@ -11,8 +11,27 @@ import es.ujaen.dae.ujabank.interfaces.Transaccion;
  *
  * @author axpos
  */
-public class Retiro extends Transaccion{
-    
-    private Cuenta origen;
-    private Tarjeta destino;
+public class Retiro extends Transaccion {
+
+    private Cuenta _origen;
+    private Tarjeta _destino;
+
+    public Retiro() {
+    }
+
+    public Cuenta getOrigen() {
+        return _origen;
+    }
+
+    public void setOrigen(Cuenta _origen) {
+        this._origen = _origen;
+    }
+
+    public Tarjeta getDestino() {
+        return _destino;
+    }
+
+    public void setDestino(Tarjeta _destino) {
+        this._destino = _destino;
+    }
 }

@@ -22,9 +22,11 @@ public class Cliente {
         DTOUsuario usuario = new DTOUsuario();
         usuario.setNombre("Pepe");
 
-        System.out.println(banco.registrar(usuario,"DAE"));
-        
+        System.out.println(banco.registrar(usuario, "DAE"));
+
         UUID r = banco.login(usuario, "DAE");
+
+//        EuroUJACoinRate e;
     }
 
 }

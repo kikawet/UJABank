@@ -462,21 +462,21 @@ table tr td dl, table tr td dl dt, table tr td dl dd {
 }
 .overviewSummary [role=tablist] button, .memberSummary [role=tablist] button,
 .typeSummary [role=tablist] button, .packagesSummary [role=tablist] button {
-   border: none;
-   cursor: pointer;
-   padding: 5px 12px 7px 12px;
-   font-weight: bold;
-   margin-right: 3px;
+    border: none;
+    cursor: pointer;
+    padding: 5px 12px 7px 12px;
+    font-weight: bold;
+    margin-right: 3px;
 }
 .overviewSummary [role=tablist] .activeTableTab, .memberSummary [role=tablist] .activeTableTab,
 .typeSummary [role=tablist] .activeTableTab, .packagesSummary [role=tablist] .activeTableTab {
-   background: #F8981D;
-   color: #253441;
+    background: #F8981D;
+    color: #253441;
 }
 .overviewSummary [role=tablist] .tableTab, .memberSummary [role=tablist] .tableTab,
 .typeSummary [role=tablist] .tableTab, .packagesSummary [role=tablist] .tableTab {
-   background: #4D7A97;
-   color: #FFFFFF;
+    background: #4D7A97;
+    color: #FFFFFF;
 }
 .rowColor th, .altColor th {
     font-weight:normal;

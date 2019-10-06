@@ -5,11 +5,30 @@
  */
 package es.ujaen.dae.ujabank.interfaces;
 
+import java.util.Date;
+
 /**
  *
  * @author axpos
  */
 public abstract class Transaccion {
-    
-   private int cantidad;
+
+    protected int _cantidad;
+    protected Date _fecha;
+
+    public int getCantidad() {
+        return _cantidad;
+    }
+
+    public void setCantidad(int _cantidad) {
+        this._cantidad = _cantidad;
+    }
+
+    public Date getFecha() {
+        return _fecha;
+    }
+
+    public void setFecha(Date _fecha) {
+        this._fecha = _fecha;
+    }
 }
