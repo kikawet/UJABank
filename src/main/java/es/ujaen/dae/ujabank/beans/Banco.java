@@ -5,6 +5,7 @@
  */
 package es.ujaen.dae.ujabank.beans;
 
+import es.dae.ujaen.euroujacoinrate.EuroUJACoinRate;
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOTarjeta;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,14 +38,16 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     private final List<Usuario> _usuariosBanco;
     private final List<Cuenta> _cuentasBanco;
     private Map<UUID, Usuario> _tokensActivos;
-
+        
+    private static final EuroUJACoinRate euro_UJACoin = new EuroUJACoinRate();
+    
     public Banco() {
         this._usuariosBanco = new ArrayList<>();
-        this._cuentasBanco = new ArrayList<>();
+        this._cuentasBanco = new ArrayList<>();        
     }
 
     @Override
-    public boolean ingresar(UUID token, DTOTarjeta origen, DTOCuenta destino, int cantidad) throws NoSuchElementException, IllegalAccessError {
+    public boolean ingresar(UUID token, DTOTarjeta origen, DTOCuenta destino, float cantidad) throws NoSuchElementException, IllegalAccessError {
 
         if (!this._tokensActivos.containsKey(token)) {
             throw new IllegalAccessError("Usuario no logeado");
@@ -62,7 +66,8 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         tarjeta.retirar(cantidad);//deshacer transsacion si es necesario
 
-//        cantidad = EuroUJACoinRate...
+        cantidad *= euro_UJACoin.euroToUJACoinToday();
+        
         Ingreso ingreso = new Ingreso();
         ingreso.setFecha(new Date());
         ingreso.setCantidad(cantidad);
@@ -75,7 +80,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     }
 
     @Override
-    public boolean transferir(UUID token, DTOCuenta origen, DTOCuenta destino, int cantidad, String concepto) throws NoSuchElementException, IllegalAccessError {
+    public boolean transferir(UUID token, DTOCuenta origen, DTOCuenta destino, float cantidad, String concepto) throws NoSuchElementException, IllegalAccessError {
         Usuario usuario = this._tokensActivos.get(token);
 
         if (usuario == null) {
@@ -109,6 +114,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         cDestino = this._cuentasBanco.get(posicionCuentaDestino);
 
 //        cantidad = EuroUJACoinRate... // no es necesario entre cuentas
+        
         Transferencia transferencia = new Transferencia();
 
         transferencia.setFecha(new Date());
@@ -124,7 +130,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     }
 
     @Override
-    public boolean retirar(UUID token, DTOCuenta origen, DTOTarjeta destino, int cantidad) throws NoSuchElementException, IllegalAccessError {
+    public boolean retirar(UUID token, DTOCuenta origen, DTOTarjeta destino, float cantidad) throws NoSuchElementException, IllegalAccessError {
         Usuario usuario = this._tokensActivos.get(token);
 
         if (usuario == null) {
@@ -159,7 +165,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         boolean retirado = cuenta.retirar(retiro);
 
-        //        cantidad = EuroUJACoinRate... 
+        cantidad *= euro_UJACoin.ujaCoinToEuroToday();
         tarjeta.ingresar(cantidad);
 
         //si no se ha ingresado deshacer

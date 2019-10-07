@@ -46,7 +46,7 @@ public class Mapper {
         }
 
         DTOCuenta dtoCuenta = new DTOCuenta();
-        dtoCuenta.setId(cuenta.getSaldo());
+        dtoCuenta.setId(cuenta.getId());
         dtoCuenta.setSaldo(cuenta.getSaldo());
         return dtoCuenta;
     }

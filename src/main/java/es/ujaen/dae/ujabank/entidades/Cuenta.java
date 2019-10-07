@@ -18,9 +18,9 @@ public class Cuenta {
 
     private static int NUMERO_CUENTAS = 0;
     private int _id;
-    private int _saldo;
+    private float _saldo;
 
-    public int getSaldo() {
+    public float getSaldo() {
         return _saldo;
     }
 
@@ -30,7 +30,7 @@ public class Cuenta {
         this(0);//llama a cuenta con saldo 0
     }
 
-    public Cuenta(int saldo) {// si pongo el saldo en el constructor no necesitaré crear un setter
+    public Cuenta(float saldo) {// si pongo el saldo en el constructor no necesitaré crear un setter
         this._id = NUMERO_CUENTAS;
         NUMERO_CUENTAS++;
 

@@ -13,14 +13,14 @@ import java.util.Date;
  */
 public abstract class Transaccion {
 
-    protected int _cantidad;
+    protected float _cantidad;
     protected Date _fecha;
 
-    public int getCantidad() {
+    public float getCantidad() {
         return _cantidad;
     }
 
-    public void setCantidad(int _cantidad) {
+    public void setCantidad(float _cantidad) {
         this._cantidad = _cantidad;
     }
 

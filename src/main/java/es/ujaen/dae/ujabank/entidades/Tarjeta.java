@@ -21,12 +21,12 @@ public class Tarjeta {
     public Tarjeta() {
     }
 
-    public boolean ingresar(int cantidad) {
+    public boolean ingresar(float cantidad) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         return true;// se supone que se modifica
     }
 
-    public boolean retirar(int cantidad) {
+    public boolean retirar(float cantidad) {
 //        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         return true;// se supone que se modifica
     }

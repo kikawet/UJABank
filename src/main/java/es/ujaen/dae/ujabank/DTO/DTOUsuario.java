@@ -16,7 +16,7 @@ public class DTOUsuario {
     private String _nombre;
     private String _dni;
     private String _domicilio;
-    private Date _fNacimiento;
+    private Date _fNacimiento = new Date();
     private String _telefono;
     private String _email;
 
