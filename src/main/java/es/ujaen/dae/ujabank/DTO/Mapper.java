@@ -51,17 +51,16 @@ public class Mapper {
         return dtoCuenta;
     }
 
-    public static Tarjeta tarjetaMapper(DTOTarjeta dtoTarjeta) {
-        if (dtoTarjeta == null) {
-            return null;
-        }
-
-        Tarjeta tarjeta = new Tarjeta();
-        tarjeta.setCvv(dtoTarjeta.getCvv());
-        tarjeta.setNumero(dtoTarjeta.getNumero());
-        tarjeta.setTitular(dtoTarjeta.getTitular());
-        tarjeta.setfCaducidad(dtoTarjeta.getfCaducidad());
-        return tarjeta;
-    }
-
+//    public static Tarjeta tarjetaMapper(DTOTarjeta dtoTarjeta) {
+//        if (dtoTarjeta == null) {
+//            return null;
+//        }
+//
+//        Tarjeta tarjeta = new Tarjeta();
+//        tarjeta.setCvv(dtoTarjeta.getCvv());
+//        tarjeta.setNumero(dtoTarjeta.getNumero());
+//        tarjeta.setTitular(dtoTarjeta.getTitular());
+//        tarjeta.setfCaducidad(dtoTarjeta.getfCaducidad());
+//        return tarjeta;
+//    }
 }

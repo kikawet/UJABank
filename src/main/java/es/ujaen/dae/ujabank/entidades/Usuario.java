@@ -5,6 +5,7 @@
  */
 package es.ujaen.dae.ujabank.entidades;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -22,13 +23,21 @@ public class Usuario {
     private String _telefono;
     private String _email;
     private String _contrasena;
-    private List<Cuenta> _cuentas;
+    private final List<Cuenta> _cuentas;
+
+    public List<Cuenta> getCuentas() {
+        return _cuentas;
+    }
 
     @Override
     public int hashCode() {
         int hash = 5;
         hash = 17 * hash + Objects.hashCode(this._dni);
         return hash;
+    }
+
+    public Usuario() {
+        this._cuentas = new ArrayList<>();
     }
 
     @Override

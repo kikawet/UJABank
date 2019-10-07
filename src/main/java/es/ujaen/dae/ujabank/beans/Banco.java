@@ -5,9 +5,9 @@
  */
 package es.ujaen.dae.ujabank.beans;
 
+import com.sun.tools.classfile.ConstantPool;
 import es.dae.ujaen.euroujacoinrate.EuroUJACoinRate;
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
-import es.ujaen.dae.ujabank.DTO.DTOTarjeta;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.DTO.Mapper;
 import es.ujaen.dae.ujabank.entidades.Cuenta;
@@ -19,13 +19,13 @@ import es.ujaen.dae.ujabank.entidades.Usuario;
 import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
 import es.ujaen.dae.ujabank.interfaces.Transaccion;
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.TreeMap;
 import java.util.UUID;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,40 +38,62 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     private final List<Usuario> _usuariosBanco;
     private final List<Cuenta> _cuentasBanco;
     private Map<UUID, Usuario> _tokensActivos;
-        
+
     private static final EuroUJACoinRate euro_UJACoin = new EuroUJACoinRate();
-    
+
     public Banco() {
         this._usuariosBanco = new ArrayList<>();
-        this._cuentasBanco = new ArrayList<>();        
+        this._cuentasBanco = new ArrayList<>();
+        this._tokensActivos = new TreeMap<>();
     }
 
     @Override
-    public boolean ingresar(UUID token, DTOTarjeta origen, DTOCuenta destino, float cantidad) throws NoSuchElementException, IllegalAccessError {
+    public boolean ingresar(UUID token, Tarjeta origen, DTOCuenta destino, float cantidad) throws IllegalAccessError, InvalidParameterException {
+        if (token == null) {
+            throw new InvalidParameterException("La token no puede ser null");
+        }
 
-        if (!this._tokensActivos.containsKey(token)) {
+        Usuario usuario = this._tokensActivos.get(token);
+
+        if (usuario == null) {
             throw new IllegalAccessError("Usuario no logeado");
         }
 
+        if (origen == null) {
+            throw new InvalidParameterException("La tarjeta no puede ser null");
+        }
+
+        if (destino == null) {
+            throw new InvalidParameterException("La cuenta no puede ser null");
+        }
+
+        if (cantidad < 0) {
+            throw new InvalidParameterException("La cantidad a ingresar no puede ser negativa");
+        }
+
         Cuenta cuenta = Mapper.cuentaMapper(destino);
-        Tarjeta tarjeta = Mapper.tarjetaMapper(origen);
+//        Tarjeta tarjeta = Mapper.tarjetaMapper(origen);
 
         int posicionCuenta = this._cuentasBanco.indexOf(cuenta);
 
         if (posicionCuenta == -1) {
-            throw new NoSuchElementException("No existe esa cuenta");
+            throw new InvalidParameterException("No existe esa cuenta");
         }
 
         cuenta = this._cuentasBanco.get(posicionCuenta);
 
-        tarjeta.retirar(cantidad);//deshacer transsacion si es necesario
+        if (usuario.containsCuenta(cuenta)) {
+            throw new InvalidParameterException("Esa cuenta no pertence a ese usuario");
+        }
+
+        origen.retirar(cantidad);//deshacer transsacion si es necesario
 
         cantidad *= euro_UJACoin.euroToUJACoinToday();
-        
+
         Ingreso ingreso = new Ingreso();
         ingreso.setFecha(new Date());
         ingreso.setCantidad(cantidad);
-        ingreso.setOrigen(tarjeta);
+        ingreso.setOrigen(origen);
         ingreso.setDestino(cuenta);
 
         boolean ingresado = cuenta.ingresar(ingreso);
@@ -80,11 +102,31 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     }
 
     @Override
-    public boolean transferir(UUID token, DTOCuenta origen, DTOCuenta destino, float cantidad, String concepto) throws NoSuchElementException, IllegalAccessError {
+    public boolean transferir(UUID token, DTOCuenta origen, DTOCuenta destino, float cantidad, String concepto) throws InvalidParameterException, IllegalAccessError {
+        if (token == null) {
+            throw new InvalidParameterException("La token no puede ser null");
+        }
+
         Usuario usuario = this._tokensActivos.get(token);
 
         if (usuario == null) {
             throw new IllegalAccessError("Usuario no logeado");
+        }
+
+        if (origen == null) {
+            throw new InvalidParameterException("La cuenta de origen no puede ser null");
+        }
+
+        if (destino == null) {
+            throw new InvalidParameterException("La cuenta de destino no puede ser null");
+        }
+
+        if (cantidad < 0) {
+            throw new InvalidParameterException("La cantidad debe ser positiva");
+        }
+
+        if (concepto == null) {
+            throw new InvalidParameterException("El concepto no puede ser null");
         }
 
         Cuenta cOrigen = Mapper.cuentaMapper(origen);
@@ -94,7 +136,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         int posicionCuentaDestino = this._cuentasBanco.indexOf(cDestino);
 
         if (posicionCuentaOrigen == -1) {
-            throw new NoSuchElementException("No existe la cuenta de origen");
+            throw new InvalidParameterException("No existe la cuenta de origen");
         }
 
         cOrigen = this._cuentasBanco.get(posicionCuentaOrigen);
@@ -108,13 +150,12 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
         if (posicionCuentaDestino == -1) {
-            throw new NoSuchElementException("La cuenta de destino no existe");
+            throw new InvalidParameterException("La cuenta de destino no existe");
         }
 
         cDestino = this._cuentasBanco.get(posicionCuentaDestino);
 
 //        cantidad = EuroUJACoinRate... // no es necesario entre cuentas
-        
         Transferencia transferencia = new Transferencia();
 
         transferencia.setFecha(new Date());
@@ -130,20 +171,35 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     }
 
     @Override
-    public boolean retirar(UUID token, DTOCuenta origen, DTOTarjeta destino, float cantidad) throws NoSuchElementException, IllegalAccessError {
+    public boolean retirar(UUID token, DTOCuenta origen, Tarjeta destino, float cantidad) throws InvalidParameterException, IllegalAccessError {
+        if (token == null) {
+            throw new InvalidParameterException("La token no puede ser null");
+        }
+
         Usuario usuario = this._tokensActivos.get(token);
 
         if (usuario == null) {
             throw new IllegalAccessError("Usuario no logeado");
         }
 
+        if (origen == null) {
+            throw new InvalidParameterException("La cuenta no puede ser null");
+        }
+
+        if (destino == null) {
+            throw new InvalidParameterException("La tarjeta no puede ser null");
+        }
+
+        if (cantidad < 0) {
+            throw new InvalidParameterException("La cantidad debe ser positiva");
+        }
+
         Cuenta cuenta = Mapper.cuentaMapper(origen);
-        Tarjeta tarjeta = Mapper.tarjetaMapper(destino);
 
         int posicionCuenta = this._cuentasBanco.indexOf(cuenta);
 
         if (posicionCuenta == -1) {
-            throw new NoSuchElementException("No existe la cuenta de origen");
+            throw new InvalidParameterException("No existe la cuenta de origen");
         }
 
         cuenta = this._cuentasBanco.get(posicionCuenta);
@@ -160,20 +216,40 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         retiro.setFecha(new Date());
         retiro.setOrigen(cuenta);
-        retiro.setDestino(tarjeta);
+        retiro.setDestino(destino);
         retiro.setCantidad(cantidad);
 
         boolean retirado = cuenta.retirar(retiro);
 
         cantidad *= euro_UJACoin.ujaCoinToEuroToday();
-        tarjeta.ingresar(cantidad);
+        destino.ingresar(cantidad);
 
         //si no se ha ingresado deshacer
         return retirado;
     }
 
     @Override
-    public List<Transaccion> consultar(UUID token, DTOCuenta cuentaDTO, Date inicio, Date fin) throws NoSuchElementException, IllegalAccessError {
+    public List<Transaccion> consultar(UUID token, DTOCuenta cuentaDTO, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
+        if (token == null) {
+            throw new InvalidParameterException("La token no puede ser null");
+        }
+
+        if (cuentaDTO == null) {
+            throw new InvalidParameterException("La cuenta no puede ser null");
+        }
+
+        if (inicio == null) {
+            throw new InvalidParameterException("La fecha de inicio no puede ser null");
+        }
+
+        if (fin == null) {
+            throw new InvalidParameterException("La fecha de fin no puede ser null");
+        }
+
+        if (fin.before(inicio)) {
+            throw new InvalidParameterException("La fecha de fin debe de ser posterior a la de inicio");
+        }
+
         Usuario usuario = this._tokensActivos.get(token);
 
         if (usuario == null) {
@@ -185,20 +261,32 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         int posicionCuenta = this._cuentasBanco.indexOf(cuenta);
 
         if (posicionCuenta == -1) {
-            throw new NoSuchElementException("No existe esa cuenta");
+            throw new InvalidParameterException("No existe esa cuenta");
         }
 
         cuenta = this._cuentasBanco.get(posicionCuenta);
 
         if (!usuario.containsCuenta(cuenta)) {
-            throw new IllegalAccessError("El usuario no tiene acceso a esa cuenta");
+            throw new InvalidParameterException("El usuario no tiene acceso a esa cuenta");
         }
 
         return cuenta.consultar(inicio, fin);
     }
 
     @Override
-    public boolean registrar(DTOUsuario u, String contasena) {
+    public boolean registrar(DTOUsuario u, String contasena) throws InvalidParameterException {
+        if (u == null) {
+            throw new InvalidParameterException("El usuario no puede ser null");
+        }
+
+        if (contasena == null) {
+            throw new InvalidParameterException("La contraseña no puede ser null");
+        }
+
+        if (contasena.isBlank()) {
+            throw new InvalidParameterException("La contraseña no puede estar vacia");
+        }
+
         Usuario usuario = Mapper.usuarioMapper(u);
         usuario.setContrasena(contasena);
         boolean insertado = false;
@@ -211,17 +299,31 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
                 this._usuariosBanco.remove(usuario);
                 this._cuentasBanco.remove(cuenta);
             }
+        } else {
+            throw new InvalidParameterException("Ese usuario ya está registrado");
         }
 
         return insertado;
     }
 
     @Override
-    public UUID login(DTOUsuario usuario, String contrasena) throws NoSuchElementException, IllegalAccessError {
+    public UUID login(DTOUsuario usuario, String contrasena) throws InvalidParameterException, IllegalAccessError {
+        if (usuario == null) {
+            throw new InvalidParameterException("El usuario no puede ser null");
+        }
+
+        if (contrasena == null) {
+            throw new InvalidParameterException("La contraseña no puede ser null");
+        }
+
+        if (contrasena.isBlank()) {
+            throw new InvalidParameterException("La contraseña no puede estar vacia");
+        }
+
         int indiceUsuario = this._usuariosBanco.indexOf(Mapper.usuarioMapper(usuario));
 
         if (indiceUsuario == -1) {
-            throw new NoSuchElementException("Ese usuario no está en el sistema");
+            throw new InvalidParameterException("Ese usuario no está en el sistema");
         }
 
         if (this._usuariosBanco.get(indiceUsuario).getContrasena() == null ? contrasena == null : !this._usuariosBanco.get(indiceUsuario).getContrasena().equals(contrasena)) {
@@ -237,23 +339,47 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
     @Override
     public DTOCuenta crearCuenta(UUID token) throws IllegalAccessError {
-        if (!this._tokensActivos.containsKey(token)) {
-            throw new IllegalAccessError("Usuario no logeado");
+        if (token == null) {
+            throw new InvalidParameterException("La token no puede ser null");
         }
 
         Usuario usuario = this._tokensActivos.get(token);
+
+        if (usuario == null) {
+            throw new IllegalAccessError("Usuario no logeado");
+        }
+
         Cuenta cuenta = new Cuenta();
 
         boolean insertado = usuario.addCuenta(cuenta);
 
         if (insertado) {
-            insertado = this._cuentasBanco.add(cuenta);
+            this._cuentasBanco.add(cuenta);
 
-            if (!insertado) {
-                usuario.removeCuenta(cuenta);
-            }
+//            if (!insertado) { //No hace falta realmente
+//                usuario.removeCuenta(cuenta);
+//            }
         }
 
         return Mapper.dtoCuentaMapper(cuenta);
+    }
+
+    @Override
+    public List<DTOCuenta> consultarCuentas(UUID token) throws IllegalAccessError {
+        if (token == null) {
+            throw new InvalidParameterException("La token no puede ser null");
+        }
+
+        if (!this._tokensActivos.containsKey(token)) {
+            throw new IllegalAccessError("Usuario no logeado");
+        }
+
+        ArrayList<DTOCuenta> cuentas = new ArrayList<>();
+
+        this._tokensActivos.get(token).getCuentas().forEach((Cuenta cuenta) -> {
+            cuentas.add(Mapper.dtoCuentaMapper(cuenta));
+        });
+
+        return cuentas;
     }
 }
