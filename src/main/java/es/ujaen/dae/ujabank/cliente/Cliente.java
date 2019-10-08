@@ -166,6 +166,10 @@ public class Cliente {
                             System.out.print("Hubo un erro al crear el usuario");
                         }
 
+                        System.out.println("Sincronizando tus cuentas ...");
+                        cuentas = sUsuarios.consultarCuentas(tokenUsuario);
+                        System.out.println(" ... cuentras sincronizadas");
+
                         break;
                     case 4:// Login usuario
 //                        String contrasena;
@@ -209,14 +213,17 @@ public class Cliente {
                         float cantidad;
                         int tarjetaIngreso,
                          cuentaIngreso;
-                        System.out.print("Introduce la cantidad que deseas ingrear: ");
-                        cantidad = Float.parseFloat(input.readLine());
 
                         System.out.println("Elige el índice de la tarjeta a usar (tienes " + tarjetas.size() + " tarjetas): ");
                         tarjetaIngreso = Integer.parseInt(input.readLine());
 
-                        System.out.println("Elige el índice de la cuenta a la que ingresar (tienes " + cuentas.size() + " tarjetas): ");
+                        System.out.println("Elige el índice de la cuenta a la que ingresar (tienes " + cuentas.size() + " cuentas): ");
                         cuentaIngreso = Integer.parseInt(input.readLine());
+
+                        System.out.print("Introduce la cantidad de euros que deseas ingrear: ");
+                        cantidad = Float.parseFloat(input.readLine());
+
+                        System.out.println("Realizando ingreso ...");
 
                         boolean ingreso = sTrans.ingresar(tokenUsuario, tarjetas.get(tarjetaIngreso), cuentas.get(cuentaIngreso), cantidad);
 
@@ -228,8 +235,70 @@ public class Cliente {
 
                         break;
                     case 7:// Transferir dinero
+                        if (tokenUsuario == null) {
+                            System.out.println("Necesitras estar logeado para realizar una transferencia");
+                            break;
+                        }
+
+                        System.out.println("Vas a realizar una transferencia");
+
+                        int cuentaOrigen,
+                         idCuentaDestino;
+                        String concepto;
+                        System.out.println("Elige el índice de la cuenta del origen de transferencia (tienes " + cuentas.size() + " cuentas): ");
+                        cuentaOrigen = Integer.parseInt(input.readLine());
+
+                        System.out.println("Indica el ID de la cuenta de destino de transferencia: ");
+                        idCuentaDestino = Integer.parseInt(input.readLine());
+
+                        System.out.println("Indica la cantidad de UJACoins que quieres transferir: ");
+                        cantidad = Float.valueOf(input.readLine());
+
+                        System.out.println("Indica el concepto de la transferencia: ");
+                        concepto = input.readLine();
+
+                        System.out.println("Realizando transferencia ...");
+
+                        DTOCuenta cuentaDestino = new DTOCuenta();
+                        cuentaDestino.setId(idCuentaDestino);
+
+                        boolean transferido = sTrans.transferir(tokenUsuario, cuentas.get(cuentaOrigen), cuentaDestino, cantidad, concepto);
+
+                        if (transferido) {
+                            System.out.println("La transferencia se realizó correctamente");
+                        } else {
+                            System.out.println("Hubo un fallo en la transferencia");
+                        }
+
                         break;
                     case 8:// Retirar dinero
+                        if (tokenUsuario == null) {
+                            System.out.println("Necesitas estar logeado para realizar un retiro");
+                            break;
+                        }
+
+                        System.out.println("Vas a realizar un retiro:");
+
+                        int tarjetaRetiro,
+                         cuentaRetiro;
+
+                        System.out.println("Elige el índice de la cuenta desde la que retirar (tienes " + cuentas.size() + " cuentas): ");
+                        cuentaRetiro = Integer.parseInt(input.readLine());
+
+                        System.out.println("Elige el índice de la tarjeta a usar (tienes " + tarjetas.size() + " tarjetas): ");
+                        tarjetaRetiro = Integer.parseInt(input.readLine());
+
+                        System.out.println("Indica la cantidad de UJACoins que quieres retirar: ");
+                        cantidad = Float.valueOf(input.readLine());
+
+                        boolean retiro = sTrans.retirar(tokenUsuario, cuentas.get(cuentaRetiro), tarjetas.get(tarjetaRetiro), cantidad);
+
+                        if (retiro) {
+                            System.out.print("El retiro se realizó con éxito");
+                        } else {
+                            System.out.print("Hubo un error al retirar el dinero");
+                        }
+
                         break;
                     case 9:// Consultar movimientos
                         break;
