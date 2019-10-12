@@ -34,4 +34,12 @@ public class Retiro extends Transaccion {
     public void setDestino(Tarjeta _destino) {
         this._destino = _destino;
     }
+
+    @Override
+    public String toString() {
+        return "Fecha: " + this.getFecha().toString() + "\n"
+                + "ID cuenta origen: " + this.getOrigen().getId() + "\n"
+                + "Número cuenta destino: " + this.getDestino().getNumero() + "\n"
+                + "Cantidad (UJAC): " + this.getCantidad() + "\n";
+    }
 }

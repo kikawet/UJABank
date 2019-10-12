@@ -10,11 +10,13 @@ import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.entidades.Tarjeta;
 import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
+import es.ujaen.dae.ujabank.interfaces.Transaccion;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -50,7 +52,7 @@ public class Cliente {
         ServiciosTransacciones sTrans = (ServiciosTransacciones) contexto.getBean("banco");
 
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-        int opcion = 0, i;
+        int opcion = 0;
 
         DTOUsuario usuario = new DTOUsuario();
 
@@ -71,18 +73,18 @@ public class Cliente {
         borrarConsola();
         while (opcion != -1) {
             try {
+                //TODO Probar del 2 al 9 a fondo
                 //Menu
-                i = 0;
                 System.out.println("Cual de estas opciones quieres realizar:");
-                System.out.println(++i + ": Modificar datos de usuario");
-                System.out.println(++i + ": Mostrar tus cuentas (logeado)");
-                System.out.println(++i + ": Registrar usuario");
-                System.out.println(++i + ": Login de usuario (registrado)");
-                System.out.println(++i + ": Crear una nueva cuenta (logeado)");
-                System.out.println(++i + ": ingresar dinero (logeado)");
-                System.out.println(++i + ": transferir dinero (logeado)");
-                System.out.println(++i + ": retirar dinero (logeado)");
-                System.out.println(++i + ": consultar movimientos (logeado)");
+                System.out.println("1: Modificar datos de usuario");
+                System.out.println("2: Mostrar tus cuentas (logeado)");
+                System.out.println("3: Registrar usuario");
+                System.out.println("4: Login de usuario (registrado)");
+                System.out.println("5: Crear una nueva cuenta (logeado)");
+                System.out.println("6: ingresar dinero (logeado)");
+                System.out.println("7: transferir dinero (logeado)");
+                System.out.println("8: retirar dinero (logeado)");
+                System.out.println("9: consultar movimientos (logeado)");
                 System.out.println("otro: salir");
 
                 opcion = Integer.parseInt(input.readLine());
@@ -301,6 +303,30 @@ public class Cliente {
 
                         break;
                     case 9:// Consultar movimientos
+                        if (tokenUsuario == null) {
+                            System.out.println("Necesitas estar logeado");
+                            break;
+                        }
+
+                        System.out.print("Introduce el indice de la cuenta que quieres consultar (tienes " + cuentas.size() + " cuentas): ");
+                        int posCuenta = Integer.parseInt(input.readLine());
+                        Date fInicio,
+                         fFin;
+
+                        System.out.print("Introduce la fecha de inicio (dd/mm/yyyy): ");
+                        String fecha = input.readLine();
+                        fInicio = sdf.parse(fecha);
+
+                        System.out.print("Introduce la fecha de fin (dd/mm/yyyy): ");
+                        fecha = input.readLine();
+                        fFin = sdf.parse(fecha);
+
+                        List<Transaccion> operaciones = sTrans.consultar(tokenUsuario, cuentas.get(posCuenta), fInicio, fFin);
+
+                        operaciones.forEach((transaccion) -> {
+                            transaccion.toString();
+                        });
+
                         break;
                     default:
                         System.out.println("SALIR");

@@ -16,6 +16,9 @@ public abstract class Transaccion {
     protected float _cantidad;
     protected Date _fecha;
 
+    @Override
+    public abstract String toString();
+
     public float getCantidad() {
         return _cantidad;
     }

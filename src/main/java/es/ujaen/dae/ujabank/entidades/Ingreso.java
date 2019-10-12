@@ -35,4 +35,12 @@ public class Ingreso extends Transaccion {
         this._destino = _destino;
     }
 
+    @Override
+    public String toString() {
+        return "Fecha: " + this.getFecha().toString() + "\n"
+                + "Número tarjeta origen: " + this.getOrigen().getNumero() + "\n"
+                + "ID cuenta destino: " + this.getDestino().getId() + "\n"
+                + "Cantidad (UJAC): " + this.getCantidad() + "\n";
+    }
+
 }

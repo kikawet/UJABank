@@ -45,4 +45,13 @@ public class Transferencia extends Transaccion {
         this._destino = _destino;
     }
 
+    @Override
+    public String toString() {
+        return "Fecha: " + this.getFecha().toString() + "\n"
+                + "ID cuenta origen: " + this.getOrigen().getId() + "\n"
+                + "ID cuenta destino: " + this.getDestino().getId() + "\n"
+                + "Cantidad (UJAC): " + this.getCantidad() + "\n"
+                + "Concepto: " + this.getConcepto();
+    }
+
 }
