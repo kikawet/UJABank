@@ -37,7 +37,8 @@ public class Ingreso extends Transaccion {
 
     @Override
     public String toString() {
-        return "Fecha: " + this.getFecha().toString() + "\n"
+        return "Ingreso :"
+                + "Fecha: " + this.getFecha().toString() + "\n"
                 + "Número tarjeta origen: " + this.getOrigen().getNumero() + "\n"
                 + "ID cuenta destino: " + this.getDestino().getId() + "\n"
                 + "Cantidad (UJAC): " + this.getCantidad() + "\n";

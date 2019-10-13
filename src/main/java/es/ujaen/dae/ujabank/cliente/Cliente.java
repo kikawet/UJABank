@@ -12,7 +12,9 @@ import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
 import es.ujaen.dae.ujabank.interfaces.Transaccion;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -28,6 +30,26 @@ import org.springframework.context.ApplicationContext;
  * @author axpos
  */
 public class Cliente {
+
+    private final DTOUsuario usuario;
+    private List<DTOCuenta> cuentas;
+    private List<Tarjeta> tarjetas;
+
+    UUID tokenUsuario;
+
+    public Cliente() {
+        usuario = new DTOUsuario();
+
+        usuario.setDni("56555555Z");
+        usuario.setDomicilio("c/ Pepito");
+        usuario.setEmail("flo00008@red.ujaen.es");
+        usuario.setNombre("flo00008");
+        usuario.setTelefono("654 365 421");
+        usuario.setfNacimiento(new Calendar.Builder().setDate(1996, 1, 1).build().getTime());
+
+        cuentas = new ArrayList<>();
+        tarjetas = crearTarjetas();
+    }
 
     private void borrarConsola() {
 
@@ -54,26 +76,12 @@ public class Cliente {
         BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
         int opcion = 0;
 
-        DTOUsuario usuario = new DTOUsuario();
-
-        usuario.setDni("56555555Z");
-        usuario.setDomicilio("c/ Pepito");
-        usuario.setEmail("flo00008@red.ujaen.es");
-        usuario.setNombre("flo00008");
-        usuario.setTelefono("654 365 421");
-        usuario.setfNacimiento(new Calendar.Builder().setDate(1996, 1, 1).build().getTime());
-
-        List<DTOCuenta> cuentas = new ArrayList<>();
-        List<Tarjeta> tarjetas = crearTarjetas();
-
-        UUID tokenUsuario = null;
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         sdf.setLenient(false);
 
         borrarConsola();
         while (opcion != -1) {
             try {
-                //TODO Probar del 2 al 9 a fondo
                 //Menu
                 System.out.println("Cual de estas opciones quieres realizar:");
                 System.out.println("1: Modificar datos de usuario");
@@ -148,7 +156,7 @@ public class Cliente {
                         } else {
                             cuentas.forEach((cuenta) -> {
                                 System.out.print("-ID: " + cuenta.getId() + "\t");
-                                System.out.println("- Saldo: " + cuenta.getSaldo());
+                                System.out.println("- Saldo (UJAC): " + cuenta.getSaldo());
                             });
                             System.out.print("Esas son todas tu cuentas y su saldo");
                         }
@@ -168,10 +176,6 @@ public class Cliente {
                             System.out.print("Hubo un erro al crear el usuario");
                         }
 
-                        System.out.println("Sincronizando tus cuentas ...");
-                        cuentas = sUsuarios.consultarCuentas(tokenUsuario);
-                        System.out.println(" ... cuentras sincronizadas");
-
                         break;
                     case 4:// Login usuario
 //                        String contrasena;
@@ -181,7 +185,12 @@ public class Cliente {
                         contrasena = input.readLine();
                         tokenUsuario = sUsuarios.login(usuario, contrasena);
 
-                        System.out.print("Usuario logeado con éxito");
+                        System.out.println("Usuario logeado con éxito");
+
+                        System.out.println("Sincronizando tus cuentas ...");
+                        cuentas = sUsuarios.consultarCuentas(tokenUsuario);
+                        System.out.print(" ... cuentras sincronizadas");
+
                         break;
                     case 5:// Crear cuenta
                         System.out.println("Creando una cuenta :");
@@ -194,10 +203,12 @@ public class Cliente {
                         DTOCuenta cuentaCreada = sUsuarios.crearCuenta(tokenUsuario);
 
                         if (cuentaCreada == null) {
-                            System.out.print("Hubo algún error al crear la cuenta");
+                            System.out.print("\t-Hubo algún error al crear la cuenta");
                         } else {
                             cuentas.add(cuentaCreada);
-                            System.out.print("Cuenta creada con éxito");
+                            System.out.println("\t-Cuenta creada con éxito");
+                            System.out.println("ID: " + cuentaCreada.getId());
+                            System.out.println("Saldo : " + cuentaCreada.getSaldo());
                         }
                         break;
                     case 6:// Ingresar dinero
@@ -216,10 +227,10 @@ public class Cliente {
                         int tarjetaIngreso,
                          cuentaIngreso;
 
-                        System.out.println("Elige el índice de la tarjeta a usar (tienes " + tarjetas.size() + " tarjetas): ");
+                        System.out.print("Elige el índice de la tarjeta a usar (tienes " + tarjetas.size() + " tarjetas): ");
                         tarjetaIngreso = Integer.parseInt(input.readLine());
 
-                        System.out.println("Elige el índice de la cuenta a la que ingresar (tienes " + cuentas.size() + " cuentas): ");
+                        System.out.print("Elige el índice de la cuenta a la que ingresar (tienes " + cuentas.size() + " cuentas): ");
                         cuentaIngreso = Integer.parseInt(input.readLine());
 
                         System.out.print("Introduce la cantidad de euros que deseas ingrear: ");
@@ -322,12 +333,13 @@ public class Cliente {
                         fFin = sdf.parse(fecha);
 
                         List<Transaccion> operaciones = sTrans.consultar(tokenUsuario, cuentas.get(posCuenta), fInicio, fFin);
-
                         operaciones.forEach((transaccion) -> {
-                            transaccion.toString();
+                            System.out.println(transaccion.toString());
+                            System.out.println("------------------");
                         });
 
                         break;
+
                     default:
                         System.out.println("SALIR");
                         opcion = -1;
@@ -337,9 +349,9 @@ public class Cliente {
                     input.readLine();//Pausa para enter
                     borrarConsola();
                 }
-            } catch (Exception ex) {
+            } catch (Exception | Error ex) {
                 Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("Hubo un error");
+                System.out.println("!Hubo un error: " + ex.getMessage());
             }
         }
 
@@ -348,7 +360,7 @@ public class Cliente {
 //        EuroUJACoinRate e;
     }
 
-    public List<Tarjeta> crearTarjetas() {
+    private static List<Tarjeta> crearTarjetas() {
         ArrayList<Tarjeta> tarjetas = new ArrayList<>();
         Tarjeta tarjeta;
 

@@ -19,11 +19,6 @@ public class Cuenta {
     private static int NUMERO_CUENTAS = 0;
     private int _id;
     private float _saldo;
-
-    public float getSaldo() {
-        return _saldo;
-    }
-
     private List<Transaccion> _historial;
 
     public Cuenta() {
@@ -35,6 +30,7 @@ public class Cuenta {
         NUMERO_CUENTAS++;
 
         this._saldo = saldo;
+        this._historial = new ArrayList<>();
     }
 
     @Override
@@ -113,4 +109,7 @@ public class Cuenta {
         this._id = _id;
     }
 
+    public float getSaldo() {
+        return _saldo;
+    }
 }

@@ -17,16 +17,16 @@ public class Transferencia extends Transaccion {
     private Cuenta _destino;
     private String _concepto;
 
+    public Transferencia() {
+
+    }
+
     public String getConcepto() {
         return _concepto;
     }
 
     public void setConcepto(String _concepto) {
         this._concepto = _concepto;
-    }
-
-    public Transferencia() {
-
     }
 
     public Cuenta getOrigen() {
@@ -47,7 +47,8 @@ public class Transferencia extends Transaccion {
 
     @Override
     public String toString() {
-        return "Fecha: " + this.getFecha().toString() + "\n"
+        return "Transferencia: "
+                + "Fecha: " + this.getFecha().toString() + "\n"
                 + "ID cuenta origen: " + this.getOrigen().getId() + "\n"
                 + "ID cuenta destino: " + this.getDestino().getId() + "\n"
                 + "Cantidad (UJAC): " + this.getCantidad() + "\n"

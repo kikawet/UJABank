@@ -82,7 +82,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         cuenta = this._cuentasBanco.get(posicionCuenta);
 
-        if (usuario.containsCuenta(cuenta)) {
+        if (!usuario.containsCuenta(cuenta)) {
             throw new InvalidParameterException("Esa cuenta no pertence a ese usuario");
         }
 
@@ -367,7 +367,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public List<DTOCuenta> consultarCuentas(UUID token) throws IllegalAccessError {
         if (token == null) {
-            throw new InvalidParameterException("La token no puede ser null");
+            throw new InvalidParameterException("El token no puede ser null");
         }
 
         if (!this._tokensActivos.containsKey(token)) {
