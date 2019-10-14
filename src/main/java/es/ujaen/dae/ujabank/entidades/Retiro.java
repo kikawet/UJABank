@@ -37,10 +37,10 @@ public class Retiro extends Transaccion {
 
     @Override
     public String toString() {
-        return "Retirada: "
+        return "Retirada: \n"
                 + "Fecha: " + this.getFecha().toString() + "\n"
                 + "ID cuenta origen: " + this.getOrigen().getId() + "\n"
                 + "Número cuenta destino: " + this.getDestino().getNumero() + "\n"
-                + "Cantidad (UJAC): " + this.getCantidad() + "\n";
+                + "Cantidad (UJAC): " + this.getCantidad();
     }
 }

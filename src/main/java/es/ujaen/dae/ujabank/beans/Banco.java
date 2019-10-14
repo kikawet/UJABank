@@ -50,7 +50,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public boolean ingresar(UUID token, Tarjeta origen, DTOCuenta destino, float cantidad) throws IllegalAccessError, InvalidParameterException {
         if (token == null) {
-            throw new InvalidParameterException("La token no puede ser null");
+            throw new InvalidParameterException("El token no puede ser null");
         }
 
         Usuario usuario = this._tokensActivos.get(token);
@@ -104,7 +104,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public boolean transferir(UUID token, DTOCuenta origen, DTOCuenta destino, float cantidad, String concepto) throws InvalidParameterException, IllegalAccessError {
         if (token == null) {
-            throw new InvalidParameterException("La token no puede ser null");
+            throw new InvalidParameterException("El token no puede ser null");
         }
 
         Usuario usuario = this._tokensActivos.get(token);
@@ -173,7 +173,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public boolean retirar(UUID token, DTOCuenta origen, Tarjeta destino, float cantidad) throws InvalidParameterException, IllegalAccessError {
         if (token == null) {
-            throw new InvalidParameterException("La token no puede ser null");
+            throw new InvalidParameterException("El token no puede ser null");
         }
 
         Usuario usuario = this._tokensActivos.get(token);
@@ -231,7 +231,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public List<Transaccion> consultar(UUID token, DTOCuenta cuentaDTO, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
         if (token == null) {
-            throw new InvalidParameterException("La token no puede ser null");
+            throw new InvalidParameterException("El token no puede ser null");
         }
 
         if (cuentaDTO == null) {
@@ -340,7 +340,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public DTOCuenta crearCuenta(UUID token) throws IllegalAccessError {
         if (token == null) {
-            throw new InvalidParameterException("La token no puede ser null");
+            throw new InvalidParameterException("El token no puede ser null");
         }
 
         Usuario usuario = this._tokensActivos.get(token);

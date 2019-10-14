@@ -32,6 +32,12 @@ public class Cuenta {
         this._saldo = saldo;
         this._historial = new ArrayList<>();
     }
+    
+    public Cuenta(int id,float saldo){
+        this._id = id;
+        this._saldo = saldo;
+        this._historial = new ArrayList<>();
+    }
 
     @Override
     public int hashCode() {
@@ -91,9 +97,9 @@ public class Cuenta {
 
     public List<Transaccion> consultar(Date inicio, Date fin) {
         ArrayList<Transaccion> consulta = new ArrayList<>();
-
+        
         this._historial.forEach((transaccion) -> {
-            if (transaccion.getFecha().after(inicio) && transaccion.getFecha().before(fin)) {
+            if (transaccion.entreFechas(inicio, fin)) {
                 consulta.add(transaccion);
             }
         });

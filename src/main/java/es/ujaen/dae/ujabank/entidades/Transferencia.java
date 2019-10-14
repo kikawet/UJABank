@@ -47,7 +47,7 @@ public class Transferencia extends Transaccion {
 
     @Override
     public String toString() {
-        return "Transferencia: "
+        return "Transferencia: \n"
                 + "Fecha: " + this.getFecha().toString() + "\n"
                 + "ID cuenta origen: " + this.getOrigen().getId() + "\n"
                 + "ID cuenta destino: " + this.getDestino().getId() + "\n"

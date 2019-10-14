@@ -258,16 +258,16 @@ public class Cliente {
                         int cuentaOrigen,
                          idCuentaDestino;
                         String concepto;
-                        System.out.println("Elige el índice de la cuenta del origen de transferencia (tienes " + cuentas.size() + " cuentas): ");
+                        System.out.print("Elige el índice de la cuenta del origen de transferencia (tienes " + cuentas.size() + " cuentas): ");
                         cuentaOrigen = Integer.parseInt(input.readLine());
 
-                        System.out.println("Indica el ID de la cuenta de destino de transferencia: ");
+                        System.out.print("Indica el ID de la cuenta de destino de transferencia: ");
                         idCuentaDestino = Integer.parseInt(input.readLine());
 
-                        System.out.println("Indica la cantidad de UJACoins que quieres transferir: ");
+                        System.out.print("Indica la cantidad de UJACoins que quieres transferir: ");
                         cantidad = Float.valueOf(input.readLine());
 
-                        System.out.println("Indica el concepto de la transferencia: ");
+                        System.out.print("Indica el concepto de la transferencia: ");
                         concepto = input.readLine();
 
                         System.out.println("Realizando transferencia ...");
@@ -278,9 +278,9 @@ public class Cliente {
                         boolean transferido = sTrans.transferir(tokenUsuario, cuentas.get(cuentaOrigen), cuentaDestino, cantidad, concepto);
 
                         if (transferido) {
-                            System.out.println("La transferencia se realizó correctamente");
+                            System.out.print("La transferencia se realizó correctamente");
                         } else {
-                            System.out.println("Hubo un fallo en la transferencia");
+                            System.out.print("Hubo un fallo en la transferencia");
                         }
 
                         break;
@@ -295,13 +295,13 @@ public class Cliente {
                         int tarjetaRetiro,
                          cuentaRetiro;
 
-                        System.out.println("Elige el índice de la cuenta desde la que retirar (tienes " + cuentas.size() + " cuentas): ");
+                        System.out.print("Elige el índice de la cuenta desde la que retirar (tienes " + cuentas.size() + " cuentas): ");
                         cuentaRetiro = Integer.parseInt(input.readLine());
 
-                        System.out.println("Elige el índice de la tarjeta a usar (tienes " + tarjetas.size() + " tarjetas): ");
+                        System.out.print("Elige el índice de la tarjeta a usar (tienes " + tarjetas.size() + " tarjetas): ");
                         tarjetaRetiro = Integer.parseInt(input.readLine());
 
-                        System.out.println("Indica la cantidad de UJACoins que quieres retirar: ");
+                        System.out.print("Indica la cantidad de UJACoins que quieres retirar: ");
                         cantidad = Float.valueOf(input.readLine());
 
                         boolean retiro = sTrans.retirar(tokenUsuario, cuentas.get(cuentaRetiro), tarjetas.get(tarjetaRetiro), cantidad);
@@ -333,11 +333,17 @@ public class Cliente {
                         fFin = sdf.parse(fecha);
 
                         List<Transaccion> operaciones = sTrans.consultar(tokenUsuario, cuentas.get(posCuenta), fInicio, fFin);
-                        operaciones.forEach((transaccion) -> {
-                            System.out.println(transaccion.toString());
-                            System.out.println("------------------");
-                        });
 
+                        if (operaciones.isEmpty()) {
+                            System.out.println("No se ha hecho ninguna operación entre esas fechas");
+                        } else {
+                            System.out.println("------------------");
+                            operaciones.forEach((transaccion) -> {
+                                System.out.println(transaccion.toString());
+                                System.out.println("------------------");
+                            });
+                        }
+                        
                         break;
 
                     default:

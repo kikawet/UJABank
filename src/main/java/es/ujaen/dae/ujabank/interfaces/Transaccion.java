@@ -5,6 +5,7 @@
  */
 package es.ujaen.dae.ujabank.interfaces;
 
+import java.util.Calendar;
 import java.util.Date;
 
 /**
@@ -34,4 +35,29 @@ public abstract class Transaccion {
     public void setFecha(Date _fecha) {
         this._fecha = _fecha;
     }
+
+    public boolean entreFechas(Date inicio, Date fin) {
+        Calendar Cfecha = Calendar.getInstance(), Cinicio = Calendar.getInstance(), Cfin = Calendar.getInstance();
+
+        Cfecha.setTime(this.getFecha());
+        Cfecha.set(Calendar.HOUR_OF_DAY, 0);
+        Cfecha.set(Calendar.MINUTE, 0);
+        Cfecha.set(Calendar.SECOND, 0);
+        Cfecha.set(Calendar.MILLISECOND, 0);
+        
+        Cinicio.setTime(this.getFecha());
+        Cinicio.set(Calendar.HOUR_OF_DAY, 0);
+        Cinicio.set(Calendar.MINUTE, 0);
+        Cinicio.set(Calendar.SECOND, 0);
+        Cinicio.set(Calendar.MILLISECOND, 0);
+        
+        Cfin.setTime(this.getFecha());
+        Cfin.set(Calendar.HOUR_OF_DAY, 0);
+        Cfin.set(Calendar.MINUTE, 0);
+        Cfin.set(Calendar.SECOND, 0);
+        Cfin.set(Calendar.MILLISECOND, 0);
+
+        return (Cfecha.equals(Cinicio) || Cfecha.equals(Cfin) || Cfecha.after(inicio) && Cfecha.before(fin));
+    }
+
 }

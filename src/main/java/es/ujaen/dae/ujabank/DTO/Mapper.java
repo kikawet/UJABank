@@ -35,8 +35,7 @@ public class Mapper {
             return null;
         }
 
-        Cuenta cuenta = new Cuenta(dtoCuenta.getSaldo());
-        cuenta.setId(dtoCuenta.getId());
+        Cuenta cuenta = new Cuenta(dtoCuenta.getId(), dtoCuenta.getSaldo());
         return cuenta;
     }
 
