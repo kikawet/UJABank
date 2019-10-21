@@ -6,7 +6,6 @@
 package es.ujaen.dae.ujabank.DTO;
 
 import es.ujaen.dae.ujabank.entidades.Cuenta;
-import es.ujaen.dae.ujabank.entidades.Tarjeta;
 import es.ujaen.dae.ujabank.entidades.Usuario;
 
 /**

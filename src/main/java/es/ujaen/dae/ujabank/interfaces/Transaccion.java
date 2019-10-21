@@ -16,6 +16,12 @@ public abstract class Transaccion {
 
     protected float _cantidad;
     protected Date _fecha;
+    
+    protected static enum TIPO{
+        ingreso,
+        retiro,
+        transferencia
+    }
 
     @Override
     public abstract String toString();
@@ -36,6 +42,8 @@ public abstract class Transaccion {
         this._fecha = _fecha;
     }
 
+    public abstract TIPO getTipo();
+    
     public boolean entreFechas(Date inicio, Date fin) {
         Calendar Cfecha = Calendar.getInstance(), Cinicio = Calendar.getInstance(), Cfin = Calendar.getInstance();
 

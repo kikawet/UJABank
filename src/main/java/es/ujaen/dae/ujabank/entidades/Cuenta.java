@@ -32,8 +32,8 @@ public class Cuenta {
         this._saldo = saldo;
         this._historial = new ArrayList<>();
     }
-    
-    public Cuenta(int id,float saldo){
+
+    public Cuenta(int id, float saldo) {
         this._id = id;
         this._saldo = saldo;
         this._historial = new ArrayList<>();
@@ -75,7 +75,7 @@ public class Cuenta {
         boolean insertado = this._historial.add(transferencia);
 
         if (insertado) {
-            if (this.equals(transferencia.getOrigen())) {
+            if (this.getId() == transferencia.getIDOrigen()) {
                 this._saldo -= transferencia.getCantidad();
             } else {
                 this._saldo += transferencia.getCantidad();
@@ -97,7 +97,7 @@ public class Cuenta {
 
     public List<Transaccion> consultar(Date inicio, Date fin) {
         ArrayList<Transaccion> consulta = new ArrayList<>();
-        
+
         this._historial.forEach((transaccion) -> {
             if (transaccion.entreFechas(inicio, fin)) {
                 consulta.add(transaccion);

@@ -13,7 +13,7 @@ import es.ujaen.dae.ujabank.DTO.Mapper;
 import es.ujaen.dae.ujabank.entidades.Cuenta;
 import es.ujaen.dae.ujabank.entidades.Ingreso;
 import es.ujaen.dae.ujabank.entidades.Retiro;
-import es.ujaen.dae.ujabank.entidades.Tarjeta;
+import es.ujaen.dae.ujabank.DTO.Tarjeta;
 import es.ujaen.dae.ujabank.entidades.Transferencia;
 import es.ujaen.dae.ujabank.entidades.Usuario;
 import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
@@ -94,7 +94,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         ingreso.setFecha(new Date());
         ingreso.setCantidad(cantidad);
         ingreso.setOrigen(origen);
-        ingreso.setDestino(cuenta);
+        ingreso.setIDDestino(cuenta.getId());
 
         boolean ingresado = cuenta.ingresar(ingreso);
 
@@ -159,8 +159,8 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         Transferencia transferencia = new Transferencia();
 
         transferencia.setFecha(new Date());
-        transferencia.setOrigen(cOrigen);
-        transferencia.setDestino(cDestino);
+        transferencia.setIDOrigen(cOrigen.getId());
+        transferencia.setIDDestino(cDestino.getId());
         transferencia.setCantidad(cantidad);
         transferencia.setConcepto(concepto);
 
@@ -215,7 +215,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         Retiro retiro = new Retiro();
 
         retiro.setFecha(new Date());
-        retiro.setOrigen(cuenta);
+        retiro.setIDOrigen(cuenta.getId());
         retiro.setDestino(destino);
         retiro.setCantidad(cantidad);
 

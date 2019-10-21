@@ -7,7 +7,8 @@ package es.ujaen.dae.ujabank.cliente;
 
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
-import es.ujaen.dae.ujabank.entidades.Tarjeta;
+import es.ujaen.dae.ujabank.entidades.Ingreso;
+import es.ujaen.dae.ujabank.DTO.Tarjeta;
 import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
 import es.ujaen.dae.ujabank.interfaces.Transaccion;
@@ -37,7 +38,7 @@ public class Cliente {
 
     UUID tokenUsuario;
 
-    public Cliente() {
+    public Cliente() {        
         usuario = new DTOUsuario();
 
         usuario.setDni("56555555Z");

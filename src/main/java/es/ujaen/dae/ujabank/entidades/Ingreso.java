@@ -5,6 +5,7 @@
  */
 package es.ujaen.dae.ujabank.entidades;
 
+import es.ujaen.dae.ujabank.DTO.Tarjeta;
 import es.ujaen.dae.ujabank.interfaces.Transaccion;
 
 /**
@@ -14,7 +15,7 @@ import es.ujaen.dae.ujabank.interfaces.Transaccion;
 public class Ingreso extends Transaccion {
 
     private Tarjeta _origen;
-    private Cuenta _destino;
+    private int _idDestino;
 
     public Ingreso() {
     }
@@ -27,12 +28,12 @@ public class Ingreso extends Transaccion {
         this._origen = _origen;
     }
 
-    public Cuenta getDestino() {
-        return _destino;
+    public int getIDDestino() {
+        return _idDestino;
     }
 
-    public void setDestino(Cuenta _destino) {
-        this._destino = _destino;
+    public void setIDDestino(int idCuentaDestino) {
+        this._idDestino = idCuentaDestino;
     }
 
     @Override
@@ -40,8 +41,13 @@ public class Ingreso extends Transaccion {
         return "Ingreso :\n"
                 + "Fecha: " + this.getFecha().toString() + "\n"
                 + "Número tarjeta origen: " + this.getOrigen().getNumero() + "\n"
-                + "ID cuenta destino: " + this.getDestino().getId() + "\n"
+                + "ID cuenta destino: " + this.getIDDestino() + "\n"
                 + "Cantidad (UJAC): " + this.getCantidad();
+    }
+
+    @Override
+    public TIPO getTipo() {
+        return TIPO.ingreso;
     }
 
 }

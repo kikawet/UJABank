@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package es.ujaen.dae.ujabank.entidades;
+package es.ujaen.dae.ujabank.DTO;
 
 import java.util.Date;
 import java.util.Objects;

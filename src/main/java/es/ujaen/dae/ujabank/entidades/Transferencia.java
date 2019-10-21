@@ -13,8 +13,8 @@ import es.ujaen.dae.ujabank.interfaces.Transaccion;
  */
 public class Transferencia extends Transaccion {
 
-    private Cuenta _origen;
-    private Cuenta _destino;
+    private int _idOrigen;
+    private int _idDestino;
     private String _concepto;
 
     public Transferencia() {
@@ -29,30 +29,35 @@ public class Transferencia extends Transaccion {
         this._concepto = _concepto;
     }
 
-    public Cuenta getOrigen() {
-        return _origen;
+    public int getIDOrigen() {
+        return _idOrigen;
     }
 
-    public void setOrigen(Cuenta _origen) {
-        this._origen = _origen;
+    public void setIDOrigen(int idCuentaOrigen) {
+        this._idOrigen = idCuentaOrigen;
     }
 
-    public Cuenta getDestino() {
-        return _destino;
+    public int getIDDestino() {
+        return _idDestino;
     }
 
-    public void setDestino(Cuenta _destino) {
-        this._destino = _destino;
+    public void setIDDestino(int idCuentaDestino) {
+        this._idDestino = idCuentaDestino;
     }
 
     @Override
     public String toString() {
         return "Transferencia: \n"
                 + "Fecha: " + this.getFecha().toString() + "\n"
-                + "ID cuenta origen: " + this.getOrigen().getId() + "\n"
-                + "ID cuenta destino: " + this.getDestino().getId() + "\n"
+                + "ID cuenta origen: " + this.getIDOrigen() + "\n"
+                + "ID cuenta destino: " + this.getIDDestino() + "\n"
                 + "Cantidad (UJAC): " + this.getCantidad() + "\n"
                 + "Concepto: " + this.getConcepto();
+    }
+
+    @Override
+    public TIPO getTipo() {
+        return TIPO.transferencia;
     }
 
 }
