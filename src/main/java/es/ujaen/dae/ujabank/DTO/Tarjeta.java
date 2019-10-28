@@ -15,7 +15,7 @@ import java.util.Objects;
 public class Tarjeta {
 
     private String _titular;
-    private String _numero;
+    private int _numero;
     private Date _fCaducidad;
     private String _cvv;
 
@@ -78,11 +78,11 @@ public class Tarjeta {
         this._titular = _titular;
     }
 
-    public String getNumero() {
+    public int getNumero() {
         return _numero;
     }
 
-    public void setNumero(String _numero) {
+    public void setNumero(int _numero) {
         this._numero = _numero;
     }
 

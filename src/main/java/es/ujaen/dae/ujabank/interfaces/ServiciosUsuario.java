@@ -21,7 +21,7 @@ public interface ServiciosUsuario {
 
     public UUID login(DTOUsuario usuario, String contrasena);
 
-    public DTOCuenta crearCuenta(UUID token);
+    public boolean crearCuenta(UUID token);
 
     public List<DTOCuenta> consultarCuentas(UUID token);
 }

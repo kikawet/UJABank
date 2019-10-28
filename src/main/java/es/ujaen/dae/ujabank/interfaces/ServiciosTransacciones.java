@@ -17,11 +17,11 @@ import java.util.UUID;
  */
 public interface ServiciosTransacciones {
 
-    public boolean ingresar(UUID token, Tarjeta origen, DTOCuenta destino, float cantidad);
+    public boolean ingresar(UUID token, Tarjeta origen, int idDestino, float cantidad);
 
-    public boolean transferir(UUID token, DTOCuenta origen, DTOCuenta destino, float cantidad, String concepto);
+    public boolean transferir(UUID token, int idOrigen, int idDestino, float cantidad, String concepto);
 
-    public boolean retirar(UUID token, DTOCuenta origen, Tarjeta destino, float cantidad);
+    public boolean retirar(UUID token, int idOrigen, Tarjeta destino, float cantidad);
 
-    public List<Transaccion> consultar(UUID token, DTOCuenta cuenta, Date inicio, Date fin);
+    public List<Transaccion> consultar(UUID token, int idCuenta, Date inicio, Date fin);
 }

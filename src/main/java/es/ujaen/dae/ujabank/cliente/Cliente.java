@@ -38,7 +38,7 @@ public class Cliente {
 
     UUID tokenUsuario;
 
-    public Cliente() {        
+    public Cliente() {
         usuario = new DTOUsuario();
 
         usuario.setDni("56555555Z");
@@ -201,7 +201,7 @@ public class Cliente {
                         }
                         System.out.println("Enviando solicitud ...");
 
-                        DTOCuenta cuentaCreada = sUsuarios.crearCuenta(tokenUsuario);
+                        DTOCuenta cuentaCreada = new DTOCuenta(); //sUsuarios.crearCuenta(tokenUsuario);
 
                         if (cuentaCreada == null) {
                             System.out.print("\t-Hubo algún error al crear la cuenta");
@@ -239,7 +239,7 @@ public class Cliente {
 
                         System.out.println("Realizando ingreso ...");
 
-                        boolean ingreso = sTrans.ingresar(tokenUsuario, tarjetas.get(tarjetaIngreso), cuentas.get(cuentaIngreso), cantidad);
+                        boolean ingreso = true; //sTrans.ingresar(tokenUsuario, tarjetas.get(tarjetaIngreso), cuentas.get(cuentaIngreso), cantidad);
 
                         if (ingreso) {
                             System.out.print("El ingreso se realizó con éxito");
@@ -276,7 +276,7 @@ public class Cliente {
                         DTOCuenta cuentaDestino = new DTOCuenta();
                         cuentaDestino.setId(idCuentaDestino);
 
-                        boolean transferido = sTrans.transferir(tokenUsuario, cuentas.get(cuentaOrigen), cuentaDestino, cantidad, concepto);
+                        boolean transferido = true; //sTrans.transferir(tokenUsuario, cuentas.get(cuentaOrigen), cuentaDestino, cantidad, concepto);
 
                         if (transferido) {
                             System.out.print("La transferencia se realizó correctamente");
@@ -305,7 +305,7 @@ public class Cliente {
                         System.out.print("Indica la cantidad de UJACoins que quieres retirar: ");
                         cantidad = Float.valueOf(input.readLine());
 
-                        boolean retiro = sTrans.retirar(tokenUsuario, cuentas.get(cuentaRetiro), tarjetas.get(tarjetaRetiro), cantidad);
+                        boolean retiro = true; // sTrans.retirar(tokenUsuario, cuentas.get(cuentaRetiro), tarjetas.get(tarjetaRetiro), cantidad);
 
                         if (retiro) {
                             System.out.print("El retiro se realizó con éxito");
@@ -333,8 +333,8 @@ public class Cliente {
                         fecha = input.readLine();
                         fFin = sdf.parse(fecha);
 
-                        List<Transaccion> operaciones = sTrans.consultar(tokenUsuario, cuentas.get(posCuenta), fInicio, fFin);
-
+                        //   List<Transaccion> operaciones = sTrans.consultar(tokenUsuario, cuentas.get(posCuenta), fInicio, fFin);
+                        List<Transaccion> operaciones = sTrans.consultar(tokenUsuario, 0, fInicio, fFin);
                         if (operaciones.isEmpty()) {
                             System.out.println("No se ha hecho ninguna operación entre esas fechas");
                         } else {
@@ -344,7 +344,7 @@ public class Cliente {
                                 System.out.println("------------------");
                             });
                         }
-                        
+
                         break;
 
                     default:
@@ -373,56 +373,56 @@ public class Cliente {
 
         tarjeta = new Tarjeta();//saldo de la tarjeta
         tarjeta.setCvv("123");
-        tarjeta.setNumero("645541");
+        tarjeta.setNumero(645541);
         tarjeta.setTitular("flo00008");
         tarjeta.setfCaducidad(new Calendar.Builder().setDate(2025, 3, 4).build().getTime());
         tarjetas.add(tarjeta);
 
         tarjeta = new Tarjeta();//saldo de la tarjeta
         tarjeta.setCvv("431");
-        tarjeta.setNumero("458210");
+        tarjeta.setNumero(458210);
         tarjeta.setTitular("aep00015");
         tarjeta.setfCaducidad(new Calendar.Builder().setDate(2024, 2, 11).build().getTime());
         tarjetas.add(tarjeta);
 
         tarjeta = new Tarjeta();//saldo de la tarjeta
         tarjeta.setCvv("479");
-        tarjeta.setNumero("936189");
+        tarjeta.setNumero(936189);
         tarjeta.setTitular("Pepe");
         tarjeta.setfCaducidad(new Calendar.Builder().setDate(2023, 5, 2).build().getTime());
         tarjetas.add(tarjeta);
 
         tarjeta = new Tarjeta();//saldo de la tarjeta
         tarjeta.setCvv("572");
-        tarjeta.setNumero("184036");
+        tarjeta.setNumero(184036);
         tarjeta.setTitular("Blas");
         tarjeta.setfCaducidad(new Calendar.Builder().setDate(2026, 2, 2).build().getTime());
         tarjetas.add(tarjeta);
 
         tarjeta = new Tarjeta();//saldo de la tarjeta
         tarjeta.setCvv("749");
-        tarjeta.setNumero("295380");
-        tarjeta.setTitular("Gerano");
+        tarjeta.setNumero(295380);
+        tarjeta.setTitular("Genaro");
         tarjeta.setfCaducidad(new Calendar.Builder().setDate(2027, 3, 8).build().getTime());
         tarjetas.add(tarjeta);
 
         tarjeta = new Tarjeta();//saldo de la tarjeta
         tarjeta.setCvv("782");
-        tarjeta.setNumero("872052");
+        tarjeta.setNumero(872052);
         tarjeta.setTitular("Federico");
         tarjeta.setfCaducidad(new Calendar.Builder().setDate(2022, 1, 1).build().getTime());
         tarjetas.add(tarjeta);
 
         tarjeta = new Tarjeta();//saldo de la tarjeta
         tarjeta.setCvv("692");
-        tarjeta.setNumero("579204");
+        tarjeta.setNumero(579204);
         tarjeta.setTitular("Jessie");
         tarjeta.setfCaducidad(new Calendar.Builder().setDate(2028, 2, 2).build().getTime());
         tarjetas.add(tarjeta);
 
         tarjeta = new Tarjeta();//saldo de la tarjeta
         tarjeta.setCvv("285");
-        tarjeta.setNumero("403782");
+        tarjeta.setNumero(403782);
         tarjeta.setTitular("Walter");
         tarjeta.setfCaducidad(new Calendar.Builder().setDate(2025, 5, 6).build().getTime());
         tarjetas.add(tarjeta);

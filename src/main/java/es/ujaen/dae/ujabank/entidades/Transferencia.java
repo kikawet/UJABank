@@ -5,6 +5,7 @@
  */
 package es.ujaen.dae.ujabank.entidades;
 
+import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.interfaces.Transaccion;
 
 /**
@@ -56,8 +57,8 @@ public class Transferencia extends Transaccion {
     }
 
     @Override
-    public TIPO getTipo() {
-        return TIPO.transferencia;
+    public DTOTransaccion.TIPO getTipo() {
+        return DTOTransaccion.TIPO.transferencia;
     }
 
 }

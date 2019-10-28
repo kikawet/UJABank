@@ -6,7 +6,11 @@
 package es.ujaen.dae.ujabank.DTO;
 
 import es.ujaen.dae.ujabank.entidades.Cuenta;
+import es.ujaen.dae.ujabank.entidades.Ingreso;
+import es.ujaen.dae.ujabank.entidades.Retiro;
+import es.ujaen.dae.ujabank.entidades.Transferencia;
 import es.ujaen.dae.ujabank.entidades.Usuario;
+import es.ujaen.dae.ujabank.interfaces.Transaccion;
 
 /**
  *
@@ -49,16 +53,38 @@ public class Mapper {
         return dtoCuenta;
     }
 
-//    public static Tarjeta tarjetaMapper(DTOTarjeta dtoTarjeta) {
-//        if (dtoTarjeta == null) {
-//            return null;
-//        }
-//
-//        Tarjeta tarjeta = new Tarjeta();
-//        tarjeta.setCvv(dtoTarjeta.getCvv());
-//        tarjeta.setNumero(dtoTarjeta.getNumero());
-//        tarjeta.setTitular(dtoTarjeta.getTitular());
-//        tarjeta.setfCaducidad(dtoTarjeta.getfCaducidad());
-//        return tarjeta;
-//    }
+    public static DTOTransaccion dtoTransaccionMapper(Transaccion transaccion) {
+
+        if (transaccion == null) {
+            return null;
+        }
+
+        DTOTransaccion dtoTransaccion = new DTOTransaccion();
+        dtoTransaccion.setCantidad(transaccion.getCantidad());
+        dtoTransaccion.setFecha(transaccion.getFecha());
+
+        if (transaccion instanceof Ingreso) {
+            Ingreso i = (Ingreso) transaccion;
+            dtoTransaccion.setOrigen(i.getIDOrigen());
+            dtoTransaccion.setDestino(i.getIDDestino());
+            dtoTransaccion.setTipo(DTOTransaccion.TIPO.ingreso);
+
+        } else if (transaccion instanceof Transferencia) {
+            Transferencia t = (Transferencia) transaccion;
+            dtoTransaccion.setOrigen(t.getIDOrigen());
+            dtoTransaccion.setDestino(t.getIDDestino());
+            dtoTransaccion.setConcepto(t.getConcepto());
+            dtoTransaccion.setTipo(DTOTransaccion.TIPO.retiro);
+
+        } else {
+            Retiro r = (Retiro) transaccion;
+            dtoTransaccion.setOrigen(r.getIDOrigen());
+            dtoTransaccion.setDestino(r.getIDDestino());
+            dtoTransaccion.setTipo(DTOTransaccion.TIPO.retiro);
+
+        }
+        return dtoTransaccion;
+
+    }
+
 }
