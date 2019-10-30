@@ -13,5 +13,5 @@ public class FechaFinAnteriorAInicio extends RuntimeException {
 
     public FechaFinAnteriorAInicio() {
     }
-    
+
 }

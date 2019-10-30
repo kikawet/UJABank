@@ -9,9 +9,9 @@ package es.ujaen.dae.ujabank.excepciones;
  *
  * @author axpos
  */
-public class UsuarioNoLogeado extends RuntimeException {
+public class CuentaSaldoInsuficiente extends RuntimeException {
 
-    public UsuarioNoLogeado() {
+    public CuentaSaldoInsuficiente() {
     }
-    
+
 }

@@ -57,17 +57,6 @@ public class Cliente {
         for (int i = 0; i < 10; ++i) {
             System.out.println("\n");
         }
-
-//        final String os = System.getProperty("os.name");
-//
-//        if (os.contains("Windows"))
-//        {
-//            Runtime.getRuntime().exec("cls");
-//        }
-//        else
-//        {
-//            Runtime.getRuntime().exec("clear");
-//        }
     }
 
     public void run(ApplicationContext contexto) {
@@ -201,15 +190,12 @@ public class Cliente {
                         }
                         System.out.println("Enviando solicitud ...");
 
-                        DTOCuenta cuentaCreada = new DTOCuenta(); //sUsuarios.crearCuenta(tokenUsuario);
+                        boolean cuentaCreada = sUsuarios.crearCuenta(tokenUsuario);
 
-                        if (cuentaCreada == null) {
+                        if (!cuentaCreada) {
                             System.out.print("\t-Hubo algún error al crear la cuenta");
                         } else {
-                            cuentas.add(cuentaCreada);
                             System.out.println("\t-Cuenta creada con éxito");
-                            System.out.println("ID: " + cuentaCreada.getId());
-                            System.out.println("Saldo : " + cuentaCreada.getSaldo());
                         }
                         break;
                     case 6:// Ingresar dinero
@@ -239,7 +225,7 @@ public class Cliente {
 
                         System.out.println("Realizando ingreso ...");
 
-                        boolean ingreso = true; //sTrans.ingresar(tokenUsuario, tarjetas.get(tarjetaIngreso), cuentas.get(cuentaIngreso), cantidad);
+                        boolean ingreso = sTrans.ingresar(tokenUsuario, tarjetas.get(tarjetaIngreso), cuentas.get(cuentaIngreso).getId(), cantidad);
 
                         if (ingreso) {
                             System.out.print("El ingreso se realizó con éxito");
@@ -273,10 +259,7 @@ public class Cliente {
 
                         System.out.println("Realizando transferencia ...");
 
-                        DTOCuenta cuentaDestino = new DTOCuenta();
-                        cuentaDestino.setId(idCuentaDestino);
-
-                        boolean transferido = true; //sTrans.transferir(tokenUsuario, cuentas.get(cuentaOrigen), cuentaDestino, cantidad, concepto);
+                        boolean transferido = sTrans.transferir(tokenUsuario, cuentas.get(cuentaOrigen).getId(), idCuentaDestino, cantidad, concepto);
 
                         if (transferido) {
                             System.out.print("La transferencia se realizó correctamente");
@@ -305,7 +288,7 @@ public class Cliente {
                         System.out.print("Indica la cantidad de UJACoins que quieres retirar: ");
                         cantidad = Float.valueOf(input.readLine());
 
-                        boolean retiro = true; // sTrans.retirar(tokenUsuario, cuentas.get(cuentaRetiro), tarjetas.get(tarjetaRetiro), cantidad);
+                        boolean retiro = sTrans.retirar(tokenUsuario, cuentas.get(cuentaRetiro).getId(), tarjetas.get(tarjetaRetiro), cantidad);
 
                         if (retiro) {
                             System.out.print("El retiro se realizó con éxito");
@@ -333,8 +316,8 @@ public class Cliente {
                         fecha = input.readLine();
                         fFin = sdf.parse(fecha);
 
-                        //   List<Transaccion> operaciones = sTrans.consultar(tokenUsuario, cuentas.get(posCuenta), fInicio, fFin);
-                        List<Transaccion> operaciones = sTrans.consultar(tokenUsuario, 0, fInicio, fFin);
+                        List<Transaccion> operaciones = sTrans.consultar(tokenUsuario, cuentas.get(posCuenta).getId(), fInicio, fFin);
+
                         if (operaciones.isEmpty()) {
                             System.out.println("No se ha hecho ninguna operación entre esas fechas");
                         } else {
@@ -358,7 +341,7 @@ public class Cliente {
                 }
             } catch (Exception | Error ex) {
                 Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("!Hubo un error: " + ex.getMessage());
+                System.out.println("!Hubo un error: " + ex.getClass().getName());
             }
         }
 

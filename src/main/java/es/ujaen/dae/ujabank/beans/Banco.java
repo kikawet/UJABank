@@ -5,6 +5,13 @@
  */
 package es.ujaen.dae.ujabank.beans;
 
+import es.ujaen.dae.ujabank.excepciones.formato.UsuarioIncorrecto;
+import es.ujaen.dae.ujabank.excepciones.formato.TokenIncorrecto;
+import es.ujaen.dae.ujabank.excepciones.formato.TarjetaIncorrecta;
+import es.ujaen.dae.ujabank.excepciones.formato.FechaIncorrecta;
+import es.ujaen.dae.ujabank.excepciones.formato.CuentaIncorrecta;
+import es.ujaen.dae.ujabank.excepciones.formato.ConceptoIncorrecto;
+import es.ujaen.dae.ujabank.excepciones.formato.CantidadNegativa;
 import es.dae.ujaen.euroujacoinrate.EuroUJACoinRate;
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
@@ -28,6 +35,7 @@ import java.util.TreeMap;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 import es.ujaen.dae.ujabank.excepciones.*;
+
 /**
  *
  * @author axpos
@@ -37,7 +45,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
     private final List<Usuario> _usuariosBanco;
     private final Map<Integer, Cuenta> _cuentasBanco;
-    private Map<UUID, Usuario> _tokensActivos;
+    private final Map<UUID, Usuario> _tokensActivos;
 
     private static final EuroUJACoinRate euro_UJACoin = new EuroUJACoinRate();
 
@@ -50,21 +58,21 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public boolean ingresar(UUID token, Tarjeta origen, int idDestino, float cantidad) throws IllegalAccessError, InvalidParameterException {
         if (token == null) {
-            throw new TokenNulo();
+            throw new TokenIncorrecto();
         }
 
         Usuario usuario = this._tokensActivos.get(token);
 
         if (usuario == null) {
-            throw new UsuarioNulo();
+            throw new UsuarioIncorrecto();
         }
 
         if (origen == null) {
-            throw new TarjetaNula();
+            throw new TarjetaIncorrecta();
         }
 
         if (idDestino < 0) {
-            throw new CuentaNula();
+            throw new CuentaIncorrecta();
         }
 
         if (cantidad < 0) {
@@ -75,7 +83,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
 //        Tarjeta tarjeta = Mapper.tarjetaMapper(origen);
         if (cuenta == null) {
-            throw new NoExisteCuenta();
+            throw new CuentaIncorrecta();
         }
 
         if (!usuario.containsCuenta(cuenta)) {
@@ -100,21 +108,21 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public boolean transferir(UUID token, int idOrigen, int idDestino, float cantidad, String concepto) throws InvalidParameterException, IllegalAccessError {
         if (token == null) {
-            throw new TokenNulo();
+            throw new TokenIncorrecto();
         }
 
         Usuario usuario = this._tokensActivos.get(token);
 
         if (usuario == null) {
-            throw new UsuarioNoLogeado();
+            throw new ErrorAutorizacion();
         }
 
         if (idOrigen < 0) {
-            throw new CuentaNula();
+            throw new CuentaIncorrecta();
         }
 
         if (idDestino == 0) {
-            throw new CuentaDestinoNula();
+            throw new CuentaIncorrecta();
         }
 
         if (cantidad < 0) {
@@ -122,26 +130,26 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
         if (concepto == null) {
-            throw new ConceptoNulo();
+            throw new ConceptoIncorrecto();
         }
 
         Cuenta cOrigen = this._cuentasBanco.get(idOrigen);
         Cuenta cDestino = this._cuentasBanco.get(idDestino);
 
         if (cOrigen == null) {
-            throw new NoExisteCuentaOrigen();
+            throw new CuentaIncorrecta();
         }
 
         if (!usuario.containsCuenta(cOrigen)) {
-            throw new UsuarioSinAccesoCuentaOrigen();
+            throw new ErrorAutorizacion();
         }
 
         if (cantidad > cOrigen.getSaldo()) {
-            throw new CuentaSinDineroSuficiente();
+            throw new CuentaSaldoInsuficiente();
         }
 
         if (cDestino == null) {
-            throw new NoExisteCuentaDestino();
+            throw new CuentaIncorrecta();
         }
 
 //        cantidad = EuroUJACoinRate... // no es necesario entre cuentas
@@ -162,21 +170,21 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public boolean retirar(UUID token, int idOrigen, Tarjeta destino, float cantidad) throws InvalidParameterException, IllegalAccessError {
         if (token == null) {
-            throw new TokenNulo();
+            throw new TokenIncorrecto();
         }
 
         Usuario usuario = this._tokensActivos.get(token);
 
         if (usuario == null) {
-            throw new UsuarioNoLogeado();
+            throw new ErrorAutorizacion();
         }
 
         if (idOrigen < 0) {
-            throw new CuentaNula();
+            throw new CuentaIncorrecta();
         }
 
         if (destino == null) {
-            throw new TarjetaNula();
+            throw new TarjetaIncorrecta();
         }
 
         if (cantidad < 0) {
@@ -186,15 +194,15 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         Cuenta cuenta = this._cuentasBanco.get(idOrigen);
 
         if (cuenta == null) {
-            throw new NoExisteCuentaOrigen();
+            throw new CuentaIncorrecta();
         }
 
         if (!usuario.containsCuenta(cuenta)) {
-            throw new UsuarioSinAccesoCuentaOrigen();
+            throw new ErrorAutorizacion();
         }
 
         if (cantidad > cuenta.getSaldo()) {
-            throw new CuentaSinDineroSuficiente();
+            throw new CuentaSaldoInsuficiente();
         }
 
         Retiro retiro = new Retiro();
@@ -216,19 +224,19 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public List<Transaccion> consultar(UUID token, int idCuenta, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
         if (token == null) {
-            throw new TokenNulo();
+            throw new TokenIncorrecto();
         }
 
         if (idCuenta < 0) {
-            throw new CuentaNula();
+            throw new CuentaIncorrecta();
         }
 
         if (inicio == null) {
-            throw new FechaInicioNula();
+            throw new FechaIncorrecta();
         }
 
         if (fin == null) {
-            throw new FechaFinNula();
+            throw new FechaIncorrecta();
         }
 
         if (fin.before(inicio)) {
@@ -238,17 +246,17 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         Usuario usuario = this._tokensActivos.get(token);
 
         if (usuario == null) {
-            throw new UsuarioNoLogeado();
+            throw new ErrorAutorizacion();
         }
 
         Cuenta cuenta = this._cuentasBanco.get(idCuenta);
 
         if (cuenta == null) {
-            throw new NoExisteCuenta();
+            throw new CuentaIncorrecta();
         }
 
         if (!usuario.containsCuenta(cuenta)) {
-            throw new UsuaroSinAccesoCuenta();
+            throw new ErrorAutorizacion();
         }
 
         return cuenta.consultar(inicio, fin);
@@ -257,15 +265,15 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public boolean registrar(DTOUsuario u, String contasena) throws InvalidParameterException {
         if (u == null) {
-            throw new UsuarioNulo();
+            throw new UsuarioIncorrecto();
         }
 
         if (contasena == null) {
-            throw new ContraseñaNula();
+            throw new ContrasenaIncorrecta();
         }
 
         if (contasena.isBlank()) {
-            throw new ContraseñaVacía();
+            throw new ContrasenaIncorrecta();
         }
 
         Usuario usuario = Mapper.usuarioMapper(u);
@@ -274,14 +282,14 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         if (!this._usuariosBanco.contains(usuario)) {
             Cuenta cuenta = new Cuenta();
             usuario.addCuenta(cuenta);
-//            insertado = this._usuariosBanco.add(usuario) && this._cuentasBanco.add(idCuenta);
-//
-//            if (!insertado) {
-//                this._usuariosBanco.remove(usuario);
-//                this._cuentasBanco.remove(cuenta);
-//            }
+            insertado = this._usuariosBanco.add(usuario) && this._cuentasBanco.put(cuenta.getId(), cuenta) != null;
+
+            if (!insertado) {
+                this._usuariosBanco.remove(usuario);
+                this._cuentasBanco.remove(cuenta.getId());
+            }
         } else {
-            throw new UsuarioYaRegistrado();
+            throw new UsuarioIncorrecto();
         }
 
         return insertado;
@@ -290,21 +298,21 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public UUID login(DTOUsuario usuario, String contrasena) throws InvalidParameterException, IllegalAccessError {
         if (usuario == null) {
-            throw new UsuarioNulo();
+            throw new UsuarioIncorrecto();
         }
 
         if (contrasena == null) {
-            throw new ContraseñaNula();
+            throw new ContrasenaIncorrecta();
         }
 
         if (contrasena.isBlank()) {
-            throw new ContraseñaVacía();
+            throw new ContrasenaIncorrecta();
         }
 
         int indiceUsuario = this._usuariosBanco.indexOf(Mapper.usuarioMapper(usuario));
 
         if (indiceUsuario == -1) {
-            throw new UsuarioNoRegistrado();
+            throw new ErrorAutorizacion();
         }
 
         if (this._usuariosBanco.get(indiceUsuario).getContrasena() == null ? contrasena == null : !this._usuariosBanco.get(indiceUsuario).getContrasena().equals(contrasena)) {
@@ -321,38 +329,34 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Override
     public boolean crearCuenta(UUID token) throws IllegalAccessError {
         if (token == null) {
-            throw new TokenNulo();
+            throw new TokenIncorrecto();
         }
 
         Usuario usuario = this._tokensActivos.get(token);
 
         if (usuario == null) {
-            throw new UsuarioNoLogeado();
+            throw new ErrorAutorizacion();
         }
 
         Cuenta cuenta = new Cuenta();
 
-//        boolean insertado = 
-        usuario.addCuenta(cuenta);
+        boolean insertado = usuario.addCuenta(cuenta);
 
-//        if (insertado) {
-//            this._cuentasBanco.add(idCuenta);
-//
-//            if (!insertado) { //No hace falta realmente
-//                usuario.removeCuenta(cuenta);
-//            }
-//        }
+        if (insertado) {
+            this._cuentasBanco.put(cuenta.getId(), cuenta);
+        }
+
         return this._cuentasBanco.put(cuenta.getId(), cuenta) != null;
     }
 
     @Override
     public List<DTOCuenta> consultarCuentas(UUID token) throws IllegalAccessError {
         if (token == null) {
-            throw new TokenNulo();
+            throw new TokenIncorrecto();
         }
 
         if (!this._tokensActivos.containsKey(token)) {
-            throw new UsuarioNoLogeado();
+            throw new ErrorAutorizacion();
         }
 
         ArrayList<DTOCuenta> cuentas = new ArrayList<>();

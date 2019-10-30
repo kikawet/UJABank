@@ -9,9 +9,9 @@ package es.ujaen.dae.ujabank.excepciones;
  *
  * @author axpos
  */
-public class NoExisteCuentaDestino extends RuntimeException{
+public class ErrorAutorizacion extends RuntimeException {
 
-    public NoExisteCuentaDestino() {
+    public ErrorAutorizacion() {
     }
-    
+
 }

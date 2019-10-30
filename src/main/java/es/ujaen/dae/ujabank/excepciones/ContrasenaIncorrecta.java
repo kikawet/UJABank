@@ -9,9 +9,9 @@ package es.ujaen.dae.ujabank.excepciones;
  *
  * @author axpos
  */
-public class ContrasenaIncorrecta extends RuntimeException{
+public class ContrasenaIncorrecta extends RuntimeException {
 
     public ContrasenaIncorrecta() {
     }
-    
+
 }

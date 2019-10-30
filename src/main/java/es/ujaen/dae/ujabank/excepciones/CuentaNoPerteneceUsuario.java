@@ -9,9 +9,9 @@ package es.ujaen.dae.ujabank.excepciones;
  *
  * @author axpos
  */
-public class CuentaNoPerteneceUsuario extends RuntimeException{
+public class CuentaNoPerteneceUsuario extends RuntimeException {
 
     public CuentaNoPerteneceUsuario() {
     }
-    
+
 }

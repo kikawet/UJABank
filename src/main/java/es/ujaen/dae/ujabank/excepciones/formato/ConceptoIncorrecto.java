@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package es.ujaen.dae.ujabank.excepciones;
+package es.ujaen.dae.ujabank.excepciones.formato;
 
 /**
  *
  * @author axpos
  */
-public class UsuarioNulo extends RuntimeException {
+public class ConceptoIncorrecto extends RuntimeException {
 
-    public UsuarioNulo() {
+    public ConceptoIncorrecto() {
     }
-    
+
 }
