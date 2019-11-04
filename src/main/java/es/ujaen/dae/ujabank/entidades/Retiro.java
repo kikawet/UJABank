@@ -6,34 +6,38 @@
 package es.ujaen.dae.ujabank.entidades;
 
 import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
-import es.ujaen.dae.ujabank.interfaces.Transaccion;
+import java.io.Serializable;
+import javax.persistence.Entity;
+import javax.persistence.Id;
 
 /**
  *
  * @author axpos
  */
-public class Retiro extends Transaccion {
+@Entity
+public class Retiro extends Transaccion implements Serializable {
 
-    private int _idOrigen;
-    private int _idDestino;
+    @Id
+    private int idOrigen;
+    private int idDestino;
 
     public Retiro() {
     }
 
     public int getIDOrigen() {
-        return _idOrigen;
+        return idOrigen;
     }
 
     public void setIDOrigen(int idCuentaOrigen) {
-        this._idOrigen = idCuentaOrigen;
+        this.idOrigen = idCuentaOrigen;
     }
 
     public int getIDDestino() {
-        return _idDestino;
+        return idDestino;
     }
 
     public void setDestino(int _idDestino) {
-        this._idDestino = _idDestino;
+        this.idDestino = _idDestino;
     }
 
     @Override

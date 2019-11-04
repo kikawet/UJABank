@@ -5,39 +5,51 @@
  */
 package es.ujaen.dae.ujabank.entidades;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
 
 /**
  *
  * @author axpos
  */
-public class Usuario {
+@Entity
+public class Usuario implements Serializable {
 
-    private String _nombre;
-    private String _dni;
-    private String _domicilio;
-    private Date _fNacimiento;
-    private String _telefono;
-    private String _email;
-    private String _contrasena;
-    private final List<Cuenta> _cuentas;
+    private String nombre;
+    @Id
+    private String dni;
+    private String domicilio;    
+    @Temporal(javax.persistence.TemporalType.DATE)
+    private Date fNacimiento;
+    private String telefono;
+    private String email;
+    private String contrasena;
+    
+    @OneToMany
+    private final List<Cuenta> cuentas;
 
     public List<Cuenta> getCuentas() {
-        return _cuentas;
+        return cuentas;
     }
 
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 17 * hash + Objects.hashCode(this._dni);
+        hash = 17 * hash + Objects.hashCode(this.dni);
         return hash;
     }
 
     public Usuario() {
-        this._cuentas = new ArrayList<>();
+        this.cuentas = new ArrayList<>();
     }
 
     @Override
@@ -52,74 +64,74 @@ public class Usuario {
             return false;
         }
         final Usuario other = (Usuario) obj;
-        return Objects.equals(this._dni, other._dni);
+        return Objects.equals(this.dni, other.dni);
     }
 
     public String getContrasena() {
-        return _contrasena;
+        return contrasena;
     }
 
     public void setContrasena(String contrasena) {
-        this._contrasena = contrasena;
+        this.contrasena = contrasena;
     }
 
     public String getNombre() {
-        return _nombre;
+        return nombre;
     }
 
     public void setNombre(String nombre) {
-        this._nombre = nombre;
+        this.nombre = nombre;
     }
 
     public String getDni() {
-        return _dni;
+        return dni;
     }
 
     public void setDni(String dni) {
-        this._dni = dni;
+        this.dni = dni;
     }
 
     public String getDomicilio() {
-        return _domicilio;
+        return domicilio;
     }
 
     public void setDomicilio(String domicilio) {
-        this._domicilio = domicilio;
+        this.domicilio = domicilio;
     }
 
     public Date getfNacimiento() {
-        return _fNacimiento;
+        return fNacimiento;
     }
 
     public void setfNacimiento(Date fNacimiento) {
-        this._fNacimiento = fNacimiento;
+        this.fNacimiento = fNacimiento;
     }
 
     public String getTelefono() {
-        return _telefono;
+        return telefono;
     }
 
     public void setTelefono(String telefono) {
-        this._telefono = telefono;
+        this.telefono = telefono;
     }
 
     public String getEmail() {
-        return _email;
+        return email;
     }
 
     public void setEmail(String email) {
-        this._email = email;
+        this.email = email;
     }
 
     public boolean addCuenta(Cuenta c) {
-        return this._cuentas.add(c);
+        return this.cuentas.add(c);
     }
 
     public boolean removeCuenta(Cuenta c) {
-        return this._cuentas.remove(c);
+        return this.cuentas.remove(c);
     }
 
     public boolean containsCuenta(Cuenta c) {
-        return this._cuentas.contains(c);
+        return this.cuentas.contains(c);
     }
 }

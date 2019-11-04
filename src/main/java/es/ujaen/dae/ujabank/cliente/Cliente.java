@@ -11,7 +11,7 @@ import es.ujaen.dae.ujabank.entidades.Ingreso;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
 import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
-import es.ujaen.dae.ujabank.interfaces.Transaccion;
+import es.ujaen.dae.ujabank.entidades.Transaccion;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

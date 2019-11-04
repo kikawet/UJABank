@@ -10,7 +10,7 @@ import es.ujaen.dae.ujabank.entidades.Ingreso;
 import es.ujaen.dae.ujabank.entidades.Retiro;
 import es.ujaen.dae.ujabank.entidades.Transferencia;
 import es.ujaen.dae.ujabank.entidades.Usuario;
-import es.ujaen.dae.ujabank.interfaces.Transaccion;
+import es.ujaen.dae.ujabank.entidades.Transaccion;
 
 /**
  *

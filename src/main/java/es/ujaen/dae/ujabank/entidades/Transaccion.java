@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package es.ujaen.dae.ujabank.interfaces;
+package es.ujaen.dae.ujabank.entidades;
 
 import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import java.util.Calendar;
@@ -15,26 +15,26 @@ import java.util.Date;
  */
 public abstract class Transaccion {
 
-    protected float _cantidad;
-    protected Date _fecha;
+    protected float cantidad;
+    protected Date fecha;
 
     @Override
     public abstract String toString();
 
     public float getCantidad() {
-        return _cantidad;
+        return cantidad;
     }
 
     public void setCantidad(float _cantidad) {
-        this._cantidad = _cantidad;
+        this.cantidad = _cantidad;
     }
 
     public Date getFecha() {
-        return _fecha;
+        return fecha;
     }
 
     public void setFecha(Date _fecha) {
-        this._fecha = _fecha;
+        this.fecha = _fecha;
     }
 
     public abstract DTOTransaccion.TIPO getTipo();

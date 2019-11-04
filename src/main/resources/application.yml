@@ -1,0 +1,11 @@
+## UJABANK
+---
+
+spring.datasource.driver-class-name: org.apache.derby.jdbc.ClientDriver
+spring.datasource.url: jdbc:derby://localhost:1527/dbujabank
+spring.datasource.username: ujabankuser
+spring.datasource.password: ujabankpass
+
+spring.jpa.show-sql: true
+spring.jpa.hibernate.ddl-auto: create
+spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.DerbyTenSevenDialect
