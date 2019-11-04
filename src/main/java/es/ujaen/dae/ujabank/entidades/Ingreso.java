@@ -8,7 +8,7 @@ package es.ujaen.dae.ujabank.entidades;
 import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import java.io.Serializable;
 import javax.persistence.Entity;
-import javax.persistence.Id;
+
 
 /**
  *
@@ -17,7 +17,7 @@ import javax.persistence.Id;
 @Entity
 public class Ingreso extends Transaccion implements Serializable {
 
-    @Id
+   
     private int idOrigen;
     private int idDestino;
 

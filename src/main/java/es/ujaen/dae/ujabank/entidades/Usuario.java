@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -34,7 +35,7 @@ public class Usuario implements Serializable {
     private String email;
     private String contrasena;
     
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE })
     private final List<Cuenta> cuentas;
 
     public List<Cuenta> getCuentas() {

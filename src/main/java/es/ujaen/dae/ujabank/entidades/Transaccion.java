@@ -6,18 +6,31 @@
 package es.ujaen.dae.ujabank.entidades;
 
 import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
  * @author axpos
  */
-public abstract class Transaccion {
+@Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+public abstract class Transaccion implements Serializable {
 
     protected float cantidad;
+    @Temporal(TemporalType.TIMESTAMP)
     protected Date fecha;
-
+    @Id
+    @GeneratedValue
+    private long id;
     @Override
     public abstract String toString();
 
