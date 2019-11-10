@@ -10,12 +10,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
+import javax.persistence.Table;
 
 /**
  *
@@ -28,25 +34,29 @@ public class Cuenta implements Serializable {
     @GeneratedValue
     private int id;
     private float saldo;
-    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE })
+
+
+    @ManyToOne(fetch = FetchType.EAGER)//Muy pocas veces no se comprueba el usuario(solo en el destino de transferencia)
+    @JoinColumn(name = "propietario")
+    Usuario propietario;
+
+    @JoinTable(name = "transacciones")
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    /*No se puede indexar por fecha este historial pero se puede @OrderColumn
+    que guarda en la DB el orden de la lista, por ahora solo hay index en transaccion*/
     private List<Transaccion> historial;
 
     public Cuenta() {
-//        this(0);//llama a cuenta con saldo 0
     }
-
-    public Cuenta(float saldo) {// si pongo el saldo en el constructor no necesitaré crear un setter
-//        this.id = NUMERO_CUENTAS;
-//        NUMERO_CUENTAS++;
-
+    public Cuenta(float saldo,Usuario propietario) {
         this.saldo = saldo;
-//        this._historial = new ArrayList<>();
+        this.propietario = propietario;
     }
 
     public Cuenta(int id, float saldo) {
         this.id = id;
         this.saldo = saldo;
-//        this._historial = new ArrayList<>();
+        this.historial = new ArrayList<>();
     }
 
     @Override
@@ -73,46 +83,39 @@ public class Cuenta implements Serializable {
     }
 
     public boolean ingresar(Ingreso ingreso) {
-        boolean insertado = true;//this._historial.add(ingreso);
-
-        if (insertado) {
-            this.saldo += ingreso.getCantidad();//hacer valor absoluto si es necesario
-        }
-        return insertado;
+        this.saldo += ingreso.getCantidad();//hacer valor absoluto si es necesario
+        return this.historial.add(ingreso);
     }
 
     public boolean transferir(Transferencia transferencia) {
-        boolean insertado = true;//this._historial.add(transferencia);
 
-        if (insertado) {
-            if (this.getId() == transferencia.getIDOrigen()) {
-                this.saldo -= transferencia.getCantidad();
-            } else {
-                this.saldo += transferencia.getCantidad();
-            }
+        if (this.getId() == transferencia.getIDOrigen()) {
+            this.saldo -= transferencia.getCantidad();
+        } else {
+            this.saldo += transferencia.getCantidad();
         }
 
-        return insertado;
+        return this.historial.add(transferencia);
     }
 
     public boolean retirar(Retiro retiro) {
-        boolean retirado = true;//this._historial.add(retiro);
-
-        if (retirado) {
-            this.saldo -= retiro.getCantidad();
-        }
-
-        return retirado;
+        this.saldo -= retiro.getCantidad();
+        return this.historial.add(retiro);
     }
 
     public List<Transaccion> consultar(Date inicio, Date fin) {
         ArrayList<Transaccion> consulta = new ArrayList<>();
+        int i = 0;
+        Transaccion transaccion = this.historial.get(i);
 
-//        this._historial.forEach((transaccion) -> {
-//            if (transaccion.entreFechas(inicio, fin)) {
-//                consulta.add(transaccion);
-//            }
-//        });
+        while (i < this.historial.size() && transaccion.beforeFecha(fin)) {
+            i++;
+            transaccion = this.historial.get(i);
+
+            if (transaccion.entreFechas(inicio, fin)) {
+                consulta.add(transaccion);
+            }
+        }
 
         return consulta;
     }
@@ -128,4 +131,13 @@ public class Cuenta implements Serializable {
     public float getSaldo() {
         return saldo;
     }
+
+    public Usuario getPropietario() {
+        return propietario;
+    }
+
+    public void setPropietario(Usuario propietario) {
+        this.propietario = propietario;
+    }
+    
 }

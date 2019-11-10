@@ -13,9 +13,7 @@ import java.util.Objects;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 import javax.persistence.Temporal;
 
 /**
@@ -35,7 +33,7 @@ public class Usuario implements Serializable {
     private String email;
     private String contrasena;
     
-    @OneToMany(cascade = {CascadeType.PERSIST,CascadeType.REMOVE })
+    @OneToMany(mappedBy = "propietario",cascade = {CascadeType.PERSIST,CascadeType.REMOVE })
     private final List<Cuenta> cuentas;
 
     public List<Cuenta> getCuentas() {
@@ -132,7 +130,7 @@ public class Usuario implements Serializable {
         return this.cuentas.remove(c);
     }
 
-    public boolean containsCuenta(Cuenta c) {
-        return this.cuentas.contains(c);
-    }
+//    public boolean containsCuenta(Cuenta c) {
+//        return this.cuentas.contains(c);
+//    }
 }

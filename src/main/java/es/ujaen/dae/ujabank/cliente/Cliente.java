@@ -158,13 +158,13 @@ public class Cliente {
 
                         contrasena = input.readLine();
 
-                        boolean registro = sUsuarios.registrar(usuario, contrasena);
+                        sUsuarios.registrar(usuario, contrasena);
 
-                        if (registro) {
+//                        if (registro) {
                             System.out.print("El registro se realizó con exito");
-                        } else {
-                            System.out.print("Hubo un erro al crear el usuario");
-                        }
+//                        } else {
+//                            System.out.print("Hubo un erro al crear el usuario");
+//                        }
 
                         break;
                     case 4:// Login usuario

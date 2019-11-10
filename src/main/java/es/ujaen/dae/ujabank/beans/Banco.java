@@ -13,6 +13,9 @@ import es.ujaen.dae.ujabank.excepciones.formato.CuentaIncorrecta;
 import es.ujaen.dae.ujabank.excepciones.formato.ConceptoIncorrecto;
 import es.ujaen.dae.ujabank.excepciones.formato.CantidadNegativa;
 import es.dae.ujaen.euroujacoinrate.EuroUJACoinRate;
+import es.ujaen.dae.ujabank.DAO.DAOCuenta;
+import es.ujaen.dae.ujabank.DAO.DAOGenerico;
+import es.ujaen.dae.ujabank.DAO.DAOUsuario;
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.DTO.Mapper;
@@ -35,6 +38,8 @@ import java.util.TreeMap;
 import java.util.UUID;
 import org.springframework.stereotype.Component;
 import es.ujaen.dae.ujabank.excepciones.*;
+import java.util.function.Consumer;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  *
@@ -43,15 +48,19 @@ import es.ujaen.dae.ujabank.excepciones.*;
 @Component
 public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
-    private final List<Usuario> _usuariosBanco;
-    private final Map<Integer, Cuenta> _cuentasBanco;
+//    private final List<Usuario> _usuariosBanco;
+    @Autowired
+    private DAOUsuario usuariosBanco;
+//    private final Map<Integer, Cuenta> _cuentasBanco;
+
+    @Autowired
+    private DAOCuenta cuentasBanco;
     private final Map<UUID, Usuario> _tokensActivos;
 
     private static final EuroUJACoinRate euro_UJACoin = new EuroUJACoinRate();
 
     public Banco() {
-        this._usuariosBanco = new ArrayList<>();
-        this._cuentasBanco = new HashMap<>();
+//        this._usuariosBanco = new ArrayList<>();
         this._tokensActivos = new TreeMap<>();
     }
 
@@ -79,14 +88,13 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CantidadNegativa();
         }
 
-        Cuenta cuenta = this._cuentasBanco.get(idDestino);
+        Cuenta cuenta = this.cuentasBanco.buscar(idDestino);
 
 //        Tarjeta tarjeta = Mapper.tarjetaMapper(origen);
-        if (cuenta == null) {
-            throw new CuentaIncorrecta();
-        }
-
-        if (!usuario.containsCuenta(cuenta)) {
+//        if (cuenta == null) {
+//            throw new CuentaIncorrecta();
+//        }
+        if (usuario.equals(cuenta.getPropietario())) {
             throw new CuentaNoPerteneceUsuario();
         }
 
@@ -133,14 +141,14 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ConceptoIncorrecto();
         }
 
-        Cuenta cOrigen = this._cuentasBanco.get(idOrigen);
-        Cuenta cDestino = this._cuentasBanco.get(idDestino);
+        Cuenta cOrigen = this.cuentasBanco.buscar(idOrigen);
+        Cuenta cDestino = this.cuentasBanco.buscar(idDestino);
 
         if (cOrigen == null) {
             throw new CuentaIncorrecta();
         }
 
-        if (!usuario.containsCuenta(cOrigen)) {
+        if (usuario.equals(cOrigen.getPropietario())) {
             throw new ErrorAutorizacion();
         }
 
@@ -191,13 +199,13 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CantidadNegativa();
         }
 
-        Cuenta cuenta = this._cuentasBanco.get(idOrigen);
+        Cuenta cuenta = this.cuentasBanco.buscar(idOrigen);
 
         if (cuenta == null) {
             throw new CuentaIncorrecta();
         }
 
-        if (!usuario.containsCuenta(cuenta)) {
+        if (usuario.equals(cuenta.getPropietario())) {
             throw new ErrorAutorizacion();
         }
 
@@ -249,13 +257,13 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ErrorAutorizacion();
         }
 
-        Cuenta cuenta = this._cuentasBanco.get(idCuenta);
+        Cuenta cuenta = this.cuentasBanco.buscar(idCuenta);
 
         if (cuenta == null) {
             throw new CuentaIncorrecta();
         }
 
-        if (!usuario.containsCuenta(cuenta)) {
+        if (usuario.equals(cuenta.getPropietario())) {
             throw new ErrorAutorizacion();
         }
 
@@ -263,7 +271,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     }
 
     @Override
-    public boolean registrar(DTOUsuario u, String contasena) throws InvalidParameterException {
+    public void registrar(DTOUsuario u, String contasena) throws InvalidParameterException {
         if (u == null) {
             throw new UsuarioIncorrecto();
         }
@@ -278,26 +286,22 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         Usuario usuario = Mapper.usuarioMapper(u);
         usuario.setContrasena(contasena);
-        boolean insertado = false;
-        if (!this._usuariosBanco.contains(usuario)) {
-            Cuenta cuenta = new Cuenta();
-            usuario.addCuenta(cuenta);
-            insertado = this._usuariosBanco.add(usuario) && this._cuentasBanco.put(cuenta.getId(), cuenta) != null;
 
-            if (!insertado) {
-                this._usuariosBanco.remove(usuario);
-                this._cuentasBanco.remove(cuenta.getId());
-            }
+        if (!this.usuariosBanco.contiene(usuario)) {
+            this.usuariosBanco.insertar(usuario);// al insertar si al añadir la cuenta da error lanza excepcion aqui
+            Cuenta cuenta = cuentasBanco.crear(0, usuario);
+
+            usuario.addCuenta(cuenta);
+            this.usuariosBanco.actualizar(usuario);
         } else {
             throw new UsuarioIncorrecto();
         }
 
-        return insertado;
     }
 
     @Override
-    public UUID login(DTOUsuario usuario, String contrasena) throws InvalidParameterException, IllegalAccessError {
-        if (usuario == null) {
+    public UUID login(DTOUsuario usuarioDTO, String contrasena) throws InvalidParameterException, IllegalAccessError {
+        if (usuarioDTO == null) {
             throw new UsuarioIncorrecto();
         }
 
@@ -309,19 +313,20 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ContrasenaIncorrecta();
         }
 
-        int indiceUsuario = this._usuariosBanco.indexOf(Mapper.usuarioMapper(usuario));
+//        int indiceUsuario = this._usuariosBanco.indexOf(Mapper.usuarioMapper(usuario));
+//
+        Usuario usuario = this.usuariosBanco.buscar(usuarioDTO.getDni());
 
-        if (indiceUsuario == -1) {
+        if (usuario == null) {
             throw new ErrorAutorizacion();
         }
-
-        if (this._usuariosBanco.get(indiceUsuario).getContrasena() == null ? contrasena == null : !this._usuariosBanco.get(indiceUsuario).getContrasena().equals(contrasena)) {
+        if (!usuario.getContrasena().equals(contrasena)) {
             throw new ContrasenaIncorrecta();
         }
 
         UUID token = UUID.randomUUID();
 
-        this._tokensActivos.put(token, this._usuariosBanco.get(indiceUsuario));
+        this._tokensActivos.put(token, usuario);
 
         return token;
     }
@@ -338,15 +343,11 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ErrorAutorizacion();
         }
 
-        Cuenta cuenta = new Cuenta();
+        Cuenta cuenta = cuentasBanco.crear(0, usuario);
 
-        boolean insertado = usuario.addCuenta(cuenta);
-
-        if (insertado) {
-            this._cuentasBanco.put(cuenta.getId(), cuenta);
-        }
-
-        return this._cuentasBanco.put(cuenta.getId(), cuenta) != null;
+//        boolean insertado = usuario.addCuenta(cuenta);
+//        usuariosBanco.actualizar(usuario);
+        return cuenta != null;
     }
 
     @Override
@@ -359,12 +360,14 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ErrorAutorizacion();
         }
 
-        ArrayList<DTOCuenta> cuentas = new ArrayList<>();
+        ArrayList<DTOCuenta> cuentasDTO = new ArrayList<>();
 
-        this._tokensActivos.get(token).getCuentas().forEach((Cuenta cuenta) -> {
-            cuentas.add(Mapper.dtoCuentaMapper(cuenta));
+        List<Cuenta> cuentas = this.usuariosBanco.getCuentas(this._tokensActivos.get(token));//this._tokensActivos.get(token).getCuentas();
+
+        cuentas.forEach((Cuenta cuenta) -> {
+            cuentasDTO.add(Mapper.dtoCuentaMapper(cuenta));
         });
 
-        return cuentas;
+        return cuentasDTO;
     }
 }

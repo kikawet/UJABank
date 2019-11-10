@@ -16,7 +16,6 @@ import javax.persistence.Entity;
  */
 @Entity
 public class Retiro extends Transaccion implements Serializable {
-
     
     private int idOrigen;
     private int idDestino;

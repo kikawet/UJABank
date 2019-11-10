@@ -7,5 +7,5 @@ spring.datasource.username: ujabankuser
 spring.datasource.password: ujabankpass
 
 spring.jpa.show-sql: true
-spring.jpa.hibernate.ddl-auto: create
+spring.jpa.hibernate.ddl-auto: none
 spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.DerbyTenSevenDialect

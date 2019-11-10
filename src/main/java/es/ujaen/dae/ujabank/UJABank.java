@@ -15,7 +15,7 @@ import org.springframework.context.ApplicationContext;
  *
  * @author lopez
  */
-@SpringBootApplication(scanBasePackages = "es.ujaen.dae.ujabank.beans")
+@SpringBootApplication(scanBasePackages = {"es.ujaen.dae.ujabank.beans","es.ujaen.dae.ujabank.DAO"})
 @EntityScan(basePackages = "es.ujaen.dae.ujabank.entidades")
 public class UJABank {
 

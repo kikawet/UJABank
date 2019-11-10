@@ -17,7 +17,7 @@ import java.util.UUID;
  */
 public interface ServiciosUsuario {
 
-    public boolean registrar(DTOUsuario usuario, String contarasena);
+    public void registrar(DTOUsuario usuario, String contarasena);
 
     public UUID login(DTOUsuario usuario, String contrasena);
 
