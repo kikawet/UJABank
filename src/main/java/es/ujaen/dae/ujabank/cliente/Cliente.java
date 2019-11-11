@@ -6,6 +6,7 @@
 package es.ujaen.dae.ujabank.cliente;
 
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
+import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.entidades.Ingreso;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
@@ -316,7 +317,7 @@ public class Cliente {
                         fecha = input.readLine();
                         fFin = sdf.parse(fecha);
 
-                        List<Transaccion> operaciones = sTrans.consultar(tokenUsuario, cuentas.get(posCuenta).getId(), fInicio, fFin);
+                        List<DTOTransaccion> operaciones = sTrans.consultar(tokenUsuario, cuentas.get(posCuenta).getId(), fInicio, fFin);
 
                         if (operaciones.isEmpty()) {
                             System.out.println("No se ha hecho ninguna operación entre esas fechas");

@@ -17,6 +17,7 @@ import es.ujaen.dae.ujabank.DAO.DAOCuenta;
 import es.ujaen.dae.ujabank.DAO.DAOGenerico;
 import es.ujaen.dae.ujabank.DAO.DAOUsuario;
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
+import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.DTO.Mapper;
 import es.ujaen.dae.ujabank.entidades.Cuenta;
@@ -94,7 +95,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 //        if (cuenta == null) {
 //            throw new CuentaIncorrecta();
 //        }
-        if (usuario.equals(cuenta.getPropietario())) {
+        if (!usuario.equals(cuenta.getPropietario())) {
             throw new CuentaNoPerteneceUsuario();
         }
 
@@ -102,15 +103,11 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         cantidad *= euro_UJACoin.euroToUJACoinToday();
 
-        Ingreso ingreso = new Ingreso();
-        ingreso.setFecha(new Date());
-        ingreso.setCantidad(cantidad);
-        ingreso.setOrigen(origen.getNumero());
-        ingreso.setIDDestino(cuenta.getId());
+     
 
-        boolean ingresado = cuenta.ingresar(ingreso);
+    
 
-        return ingresado;
+        return this.cuentasBanco.ingresar(origen, cuenta, cantidad)!= null;
     }
 
     @Override
@@ -148,7 +145,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CuentaIncorrecta();
         }
 
-        if (usuario.equals(cOrigen.getPropietario())) {
+        if (!usuario.equals(cOrigen.getPropietario())) {
             throw new ErrorAutorizacion();
         }
 
@@ -161,18 +158,10 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
 //        cantidad = EuroUJACoinRate... // no es necesario entre cuentas
-        Transferencia transferencia = new Transferencia();
-
-        transferencia.setFecha(new Date());
-        transferencia.setIDOrigen(cOrigen.getId());
-        transferencia.setIDDestino(cDestino.getId());
-        transferencia.setCantidad(cantidad);
-        transferencia.setConcepto(concepto);
-
-        boolean transferido = cOrigen.transferir(transferencia) && cDestino.transferir(transferencia); // hacer dos pasos si hace falta deshacer
+       
 
         //deshacer si es necesario
-        return transferido;
+        return this.cuentasBanco.transferir(cOrigen, cDestino, cantidad, concepto)!=null;
     }
 
     @Override
@@ -205,7 +194,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CuentaIncorrecta();
         }
 
-        if (usuario.equals(cuenta.getPropietario())) {
+        if (!usuario.equals(cuenta.getPropietario())) {
             throw new ErrorAutorizacion();
         }
 
@@ -213,24 +202,17 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CuentaSaldoInsuficiente();
         }
 
-        Retiro retiro = new Retiro();
-
-        retiro.setFecha(new Date());
-        retiro.setIDOrigen(cuenta.getId());
-        retiro.setDestino(destino.getNumero());
-        retiro.setCantidad(cantidad);
-
-        boolean retirado = cuenta.retirar(retiro);
+    
 
         cantidad *= euro_UJACoin.ujaCoinToEuroToday();
         destino.ingresar(cantidad);
 
         //si no se ha ingresado deshacer
-        return retirado;
+        return this.cuentasBanco.retirar(cuenta, destino, cantidad)!=null;
     }
 
     @Override
-    public List<Transaccion> consultar(UUID token, int idCuenta, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
+    public List<DTOTransaccion> consultar(UUID token, int idCuenta, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
         if (token == null) {
             throw new TokenIncorrecto();
         }
@@ -263,11 +245,16 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CuentaIncorrecta();
         }
 
-        if (usuario.equals(cuenta.getPropietario())) {
+        if (!usuario.equals(cuenta.getPropietario())) {
             throw new ErrorAutorizacion();
         }
 
-        return cuenta.consultar(inicio, fin);
+        List<Transaccion> transacciones = this.cuentasBanco.consultarTransacciones(cuenta, inicio, fin);
+        List<DTOTransaccion> dtoTransacciones = new ArrayList<>();
+        transacciones.forEach((transaccion) -> {
+            dtoTransacciones.add(Mapper.dtoTransaccionMapper(transaccion));
+        });
+        return dtoTransacciones;
     }
 
     @Override
