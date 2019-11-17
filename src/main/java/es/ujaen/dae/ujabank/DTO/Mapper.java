@@ -74,7 +74,7 @@ public class Mapper {
             dtoTransaccion.setOrigen(t.getIDOrigen());
             dtoTransaccion.setDestino(t.getIDDestino());
             dtoTransaccion.setConcepto(t.getConcepto());
-            dtoTransaccion.setTipo(DTOTransaccion.TIPO.retiro);
+            dtoTransaccion.setTipo(DTOTransaccion.TIPO.transferencia);
 
         } else {
             Retiro r = (Retiro) transaccion;

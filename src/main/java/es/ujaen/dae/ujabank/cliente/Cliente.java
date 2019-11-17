@@ -162,7 +162,7 @@ public class Cliente {
                         sUsuarios.registrar(usuario, contrasena);
 
 //                        if (registro) {
-                            System.out.print("El registro se realizó con exito");
+                        System.out.print("El registro se realizó con exito");
 //                        } else {
 //                            System.out.print("Hubo un erro al crear el usuario");
 //                        }
@@ -324,7 +324,28 @@ public class Cliente {
                         } else {
                             System.out.println("------------------");
                             operaciones.forEach((transaccion) -> {
-                                System.out.println(transaccion.toString());
+                                
+                                switch (transaccion.getTipo()) {
+                                    case ingreso:
+                                        System.out.println("Ingreso:");
+                                        break;
+                                    case transferencia:
+                                        System.out.println("Transferencia:");
+                                        break;
+                                    case retiro:
+                                        System.out.println("Retiro:");
+                                        break;
+                                }
+
+                                System.out.println("\tId Origen: " + transaccion.getOrigen());
+                                System.out.println("\tId Destino: " + transaccion.getDestino());
+                                System.out.println("\tFecha: " + transaccion.getFecha().toString());
+                                System.out.println("\tCantidad: "+transaccion.getCantidad());
+
+                                if (transaccion.getTipo() == DTOTransaccion.TIPO.transferencia) {
+                                    System.out.println("Concepto: " + transaccion.getConcepto());
+                                }
+
                                 System.out.println("------------------");
                             });
                         }

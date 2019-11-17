@@ -15,6 +15,8 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -28,18 +30,20 @@ import javax.persistence.TemporalType;
 @Table(indexes = {@Index(columnList = "fecha")})
 public abstract class Transaccion implements Serializable {
 
-    protected float cantidad;
+    protected double cantidad;
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "fecha")
     protected Date fecha;
+    
     @Id
     @GeneratedValue
+    @Column(name = "id")//el nombre es el mismo pero de este modo se confirma    
     private long id;
 
     @Override
     public abstract String toString();
 
-    public float getCantidad() {
+    public double getCantidad() {
         return cantidad;
     }
 

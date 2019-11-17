@@ -15,6 +15,8 @@ import es.ujaen.dae.ujabank.entidades.Usuario;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
@@ -60,16 +62,17 @@ public class DAOCuenta extends DAOGenerico<Cuenta> {
         ingreso.setCantidad(cantidad);
         ingreso.setOrigen(origen.getNumero());
         ingreso.setIDDestino(destino.getId());
+
         boolean ingresar = destino.ingresar(ingreso);
         return (ingresar) ? (ingreso) : (null);
 
     }
 
     public Transferencia transferir(Cuenta origen, Cuenta destino, float cantidad, String concepto) {
+        
         origen = this.actualizar(origen);
-
         destino = this.actualizar(destino);
-
+        
         Transferencia transferencia = new Transferencia();
 
         transferencia.setFecha(new Date());
@@ -77,7 +80,13 @@ public class DAOCuenta extends DAOGenerico<Cuenta> {
         transferencia.setIDDestino(destino.getId());
         transferencia.setCantidad(cantidad);
         transferencia.setConcepto(concepto);
-        boolean transferir = origen.transferir(transferencia) && destino.transferir(transferencia); // hacer dos pasos si hace falta deshacer
+        this.em.persist(transferencia);
+        this.em.flush();
+
+        
+        boolean transferir = origen.transferir(transferencia) && destino.transferir(transferencia);
+
+
         return (transferir) ? (transferencia) : (null);
     }
 

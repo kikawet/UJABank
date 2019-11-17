@@ -33,7 +33,7 @@ public class Usuario implements Serializable {
     private String email;
     private String contrasena;
     
-    @OneToMany(mappedBy = "propietario",cascade = {CascadeType.PERSIST,CascadeType.REMOVE })
+    @OneToMany(mappedBy = "propietario",cascade = {CascadeType.PERSIST,CascadeType.REMOVE })//,orphanRemoval = true)
     private final List<Cuenta> cuentas;
 
     public List<Cuenta> getCuentas() {

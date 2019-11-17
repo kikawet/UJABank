@@ -103,11 +103,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         cantidad *= euro_UJACoin.euroToUJACoinToday();
 
-     
-
-    
-
-        return this.cuentasBanco.ingresar(origen, cuenta, cantidad)!= null;
+        return this.cuentasBanco.ingresar(origen, cuenta, cantidad) != null;
     }
 
     @Override
@@ -158,10 +154,8 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
 //        cantidad = EuroUJACoinRate... // no es necesario entre cuentas
-       
-
         //deshacer si es necesario
-        return this.cuentasBanco.transferir(cOrigen, cDestino, cantidad, concepto)!=null;
+        return this.cuentasBanco.transferir(cOrigen, cDestino, cantidad, concepto) != null;
     }
 
     @Override
@@ -202,13 +196,13 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CuentaSaldoInsuficiente();
         }
 
-    
+        boolean retiro = this.cuentasBanco.retirar(cuenta, destino, cantidad) != null;
 
         cantidad *= euro_UJACoin.ujaCoinToEuroToday();
         destino.ingresar(cantidad);
 
         //si no se ha ingresado deshacer
-        return this.cuentasBanco.retirar(cuenta, destino, cantidad)!=null;
+        return retiro;
     }
 
     @Override

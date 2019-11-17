@@ -18,10 +18,12 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 /**
  *
@@ -32,28 +34,31 @@ public class Cuenta implements Serializable {
 
     @Id
     @GeneratedValue
+    @Column(name = "id")
     private int id;
-    private float saldo;
-
+    private double saldo;
 
     @ManyToOne(fetch = FetchType.EAGER)//Muy pocas veces no se comprueba el usuario(solo en el destino de transferencia)
     @JoinColumn(name = "propietario")
     Usuario propietario;
 
-    @JoinTable(name = "transacciones")
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @JoinTable(name = "transacciones"
+//            ,schema = "aptatas"
+    )//marcar el id es para confirmar 
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     /*No se puede indexar por fecha este historial pero se puede @OrderColumn
     que guarda en la DB el orden de la lista, por ahora solo hay index en transaccion*/
     private List<Transaccion> historial;
 
     public Cuenta() {
     }
-    public Cuenta(float saldo,Usuario propietario) {
+
+    public Cuenta(float saldo, Usuario propietario) {
         this.saldo = saldo;
         this.propietario = propietario;
     }
 
-    public Cuenta(int id, float saldo) {
+    public Cuenta(int id, double saldo) {
         this.id = id;
         this.saldo = saldo;
         this.historial = new ArrayList<>();
@@ -128,7 +133,7 @@ public class Cuenta implements Serializable {
         this.id = _id;
     }
 
-    public float getSaldo() {
+    public double getSaldo() {
         return saldo;
     }
 
@@ -139,5 +144,5 @@ public class Cuenta implements Serializable {
     public void setPropietario(Usuario propietario) {
         this.propietario = propietario;
     }
-    
+
 }
