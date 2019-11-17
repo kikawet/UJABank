@@ -9,8 +9,13 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -18,13 +23,13 @@ import org.springframework.stereotype.Repository;
  * @param <T>
  */
 @Repository
-@Transactional
+@Transactional(propagation = Propagation.REQUIRED)
 public abstract class DAOGenerico<T extends Serializable> {
 
     @PersistenceContext
     protected EntityManager em;
 
-    private Class<T> _clase;
+    private final Class<T> _clase;
 
     public DAOGenerico() {
         _clase = (Class<T>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
@@ -32,20 +37,29 @@ public abstract class DAOGenerico<T extends Serializable> {
 
     public void insertar(T t) {
         em.persist(t);
-    }    
-    
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
     public T buscar(Object clave) {
         return em.find(this._clase, clave);
     }
-    
+
     public T actualizar(T t) {
         return em.merge(t);
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "cacheCuentasUsuario", key = "#clave"),
+        @CacheEvict(value = "cacheCuentas", key = "#clave")
+    })
     public void borrar(Object clave) {
         em.remove(em.find(this._clase, clave));
     }
 
+    @Caching(evict = {
+        @CacheEvict(value = "cacheCuentasUsuario", key = "#t.getID()"),
+        @CacheEvict(value = "cacheCuentas", key = "#t.getID()")
+    })
     public void borrar(T t) {
         em.remove(em.merge(t));
     }

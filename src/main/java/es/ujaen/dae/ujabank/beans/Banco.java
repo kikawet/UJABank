@@ -325,6 +325,9 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
         Cuenta cuenta = cuentasBanco.crear(0, usuario);
+//        propietario = this.em.merge(propietario);
+//        propietario.addCuenta(cuenta);
+//        this.em.persist(cuenta);
 
 //        boolean insertado = usuario.addCuenta(cuenta);
 //        usuariosBanco.actualizar(usuario);

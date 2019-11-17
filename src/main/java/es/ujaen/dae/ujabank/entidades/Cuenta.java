@@ -94,7 +94,7 @@ public class Cuenta implements Serializable {
 
     public boolean transferir(Transferencia transferencia) {
 
-        if (this.getId() == transferencia.getIDOrigen()) {
+        if (this.getID() == transferencia.getIDOrigen()) {
             this.saldo -= transferencia.getCantidad();
         } else {
             this.saldo += transferencia.getCantidad();
@@ -125,11 +125,11 @@ public class Cuenta implements Serializable {
         return consulta;
     }
 
-    public int getId() {
+    public int getID() {
         return id;
     }
 
-    public void setId(int _id) {
+    public void setID(int _id) {
         this.id = _id;
     }
 

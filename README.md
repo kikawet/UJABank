@@ -1,5 +1,3 @@
 ## TODO
-* meter islamiento
-* cachear
-* hacer menu
+* copiar menu
 * limpiar

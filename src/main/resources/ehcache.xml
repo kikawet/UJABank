@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="http://www.ehcache.org/ehcache.xsd"
+         updateCheck="true"
+         monitoring="autodetect"
+         dynamicConfig="true">
+
+    <!--Cache para la lista de cuentas de un usuario-->
+    <cache name="cacheCuentasUsuario"
+           maxElementsInMemory="50"
+           eternal="false"
+           overflowToDisk="false"/>
+<!--           timeToLiveSeconds="300"
+           timeToIdleSeconds="0"
+           memoryStoreEvictionPolicy="LFU"
+           transactionalMode="off">-->
+           
+    <!--</cache>-->
+
+    <!--Cache de cuentas-->
+    <cache name="cacheCuentas"
+           maxElementsInMemory="100"
+           eternal="false"
+           overflowToDisk="false"/>
+    
+    <!--Cache de transacciones-->
+    <!--Decido no cachearlas al final ya que al incluir la fecha no se repetirían muchas peticiones-->
+<!--    <cache name="cacheTransaccionesCuenta"
+           maxElementsInMemory="500"
+           eternal="false"
+           overflowToDisk="false"/>-->
+
+</ehcache>

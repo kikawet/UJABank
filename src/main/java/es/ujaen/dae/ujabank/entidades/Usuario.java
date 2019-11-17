@@ -39,7 +39,11 @@ public class Usuario implements Serializable {
     public List<Cuenta> getCuentas() {
         return cuentas;
     }
-
+    
+    public String getID(){
+        return this.dni;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 5;
