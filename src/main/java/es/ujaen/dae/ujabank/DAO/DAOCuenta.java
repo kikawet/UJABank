@@ -18,7 +18,6 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,9 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(propagation = Propagation.REQUIRED)
 public class DAOCuenta extends DAOGenerico<Cuenta> {
 
-//    @PersistenceContext
-//    EntityManager em;
-    //CRUD
     @CacheEvict(value = "cacheCuentasUsuario", key = "#propietario.getID()")
     public Cuenta crear(float saldo, Usuario propietario) {
         Cuenta cuenta = new Cuenta(saldo, propietario);
@@ -42,25 +38,11 @@ public class DAOCuenta extends DAOGenerico<Cuenta> {
         return cuenta;
     }
 
-    @Cacheable(value = "cacheCuentas",key = "#id")//Tengo que sobreescrubir este metodo para poder cachear solo cuentas
-//    @Override
+    @Cacheable(value = "cacheCuentas", key = "#id")//Tengo que sobreescrubir este metodo para poder cachear solo cuentas
     public Cuenta buscar(int id) {
         return super.buscar(id);
     }
-    
-//    
-//    public Cuenta buscar(int id){
-//        return em.find(Cuenta.class, id);
-//    }
-//    
-//    public void actualizar(Cuenta cuenta){
-//        em.merge(cuenta);
-//    }
-//    
-//    public void borrar(int id){
-//        Cuenta cuenta = em.find(Cuenta.class, id);
-//        em.remove(cuenta);
-//    }
+
     @Caching(evict = {
         @CacheEvict(value = "cacheCuentasUsuario", key = "#destino.getPropietario().getID()"),
         @CacheEvict(value = "cacheCuentas", key = "#destino.getID()")

@@ -7,7 +7,6 @@ package es.ujaen.dae.ujabank.interfaces;
 
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
-import es.ujaen.dae.ujabank.entidades.Cuenta;
 import java.util.List;
 import java.util.UUID;
 

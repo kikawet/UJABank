@@ -5,42 +5,36 @@
  */
 package es.ujaen.dae.ujabank.beans;
 
-import es.ujaen.dae.ujabank.excepciones.formato.UsuarioIncorrecto;
-import es.ujaen.dae.ujabank.excepciones.formato.TokenIncorrecto;
-import es.ujaen.dae.ujabank.excepciones.formato.TarjetaIncorrecta;
-import es.ujaen.dae.ujabank.excepciones.formato.FechaIncorrecta;
-import es.ujaen.dae.ujabank.excepciones.formato.CuentaIncorrecta;
-import es.ujaen.dae.ujabank.excepciones.formato.ConceptoIncorrecto;
-import es.ujaen.dae.ujabank.excepciones.formato.CantidadNegativa;
 import es.dae.ujaen.euroujacoinrate.EuroUJACoinRate;
 import es.ujaen.dae.ujabank.DAO.DAOCuenta;
-import es.ujaen.dae.ujabank.DAO.DAOGenerico;
 import es.ujaen.dae.ujabank.DAO.DAOUsuario;
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.DTO.Mapper;
-import es.ujaen.dae.ujabank.entidades.Cuenta;
-import es.ujaen.dae.ujabank.entidades.Ingreso;
-import es.ujaen.dae.ujabank.entidades.Retiro;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
-import es.ujaen.dae.ujabank.entidades.Transferencia;
+import es.ujaen.dae.ujabank.entidades.Cuenta;
+import es.ujaen.dae.ujabank.entidades.Transaccion;
 import es.ujaen.dae.ujabank.entidades.Usuario;
+import es.ujaen.dae.ujabank.excepciones.*;
+import es.ujaen.dae.ujabank.excepciones.formato.CantidadNegativa;
+import es.ujaen.dae.ujabank.excepciones.formato.ConceptoIncorrecto;
+import es.ujaen.dae.ujabank.excepciones.formato.CuentaIncorrecta;
+import es.ujaen.dae.ujabank.excepciones.formato.FechaIncorrecta;
+import es.ujaen.dae.ujabank.excepciones.formato.TarjetaIncorrecta;
+import es.ujaen.dae.ujabank.excepciones.formato.TokenIncorrecto;
+import es.ujaen.dae.ujabank.excepciones.formato.UsuarioIncorrecto;
 import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
-import es.ujaen.dae.ujabank.entidades.Transaccion;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
-import org.springframework.stereotype.Component;
-import es.ujaen.dae.ujabank.excepciones.*;
-import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
@@ -49,10 +43,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Component
 public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
-//    private final List<Usuario> _usuariosBanco;
     @Autowired
     private DAOUsuario usuariosBanco;
-//    private final Map<Integer, Cuenta> _cuentasBanco;
 
     @Autowired
     private DAOCuenta cuentasBanco;
@@ -61,7 +53,6 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     private static final EuroUJACoinRate euro_UJACoin = new EuroUJACoinRate();
 
     public Banco() {
-//        this._usuariosBanco = new ArrayList<>();
         this._tokensActivos = new TreeMap<>();
     }
 
@@ -91,15 +82,15 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         Cuenta cuenta = this.cuentasBanco.buscar(idDestino);
 
-//        Tarjeta tarjeta = Mapper.tarjetaMapper(origen);
-//        if (cuenta == null) {
-//            throw new CuentaIncorrecta();
-//        }
+        if (cuenta == null) {
+            throw new CuentaIncorrecta();
+        }
+
         if (!usuario.equals(cuenta.getPropietario())) {
             throw new CuentaNoPerteneceUsuario();
         }
 
-        origen.retirar(cantidad);//deshacer transsacion si es necesario
+        origen.retirar(cantidad);
 
         cantidad *= euro_UJACoin.euroToUJACoinToday();
 
@@ -154,7 +145,6 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
 //        cantidad = EuroUJACoinRate... // no es necesario entre cuentas
-        //deshacer si es necesario
         return this.cuentasBanco.transferir(cOrigen, cDestino, cantidad, concepto) != null;
     }
 
@@ -294,8 +284,6 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ContrasenaIncorrecta();
         }
 
-//        int indiceUsuario = this._usuariosBanco.indexOf(Mapper.usuarioMapper(usuario));
-//
         Usuario usuario = this.usuariosBanco.buscar(usuarioDTO.getDni());
 
         if (usuario == null) {
@@ -325,12 +313,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
         Cuenta cuenta = cuentasBanco.crear(0, usuario);
-//        propietario = this.em.merge(propietario);
-//        propietario.addCuenta(cuenta);
-//        this.em.persist(cuenta);
 
-//        boolean insertado = usuario.addCuenta(cuenta);
-//        usuariosBanco.actualizar(usuario);
         return cuenta != null;
     }
 
@@ -346,7 +329,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         ArrayList<DTOCuenta> cuentasDTO = new ArrayList<>();
 
-        List<Cuenta> cuentas = this.usuariosBanco.getCuentas(this._tokensActivos.get(token));//this._tokensActivos.get(token).getCuentas();
+        List<Cuenta> cuentas = this.usuariosBanco.getCuentas(this._tokensActivos.get(token));
 
         cuentas.forEach((Cuenta cuenta) -> {
             cuentasDTO.add(Mapper.dtoCuentaMapper(cuenta));

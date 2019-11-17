@@ -26,24 +26,24 @@ public class Usuario implements Serializable {
     private String nombre;
     @Id
     private String dni;
-    private String domicilio;    
+    private String domicilio;
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date fNacimiento;
     private String telefono;
     private String email;
     private String contrasena;
-    
-    @OneToMany(mappedBy = "propietario",cascade = {CascadeType.PERSIST,CascadeType.REMOVE })//,orphanRemoval = true)
+
+    @OneToMany(mappedBy = "propietario", cascade = {CascadeType.PERSIST, CascadeType.REMOVE})//,orphanRemoval = true)
     private final List<Cuenta> cuentas;
 
     public List<Cuenta> getCuentas() {
         return cuentas;
     }
-    
-    public String getID(){
+
+    public String getID() {
         return this.dni;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 5;

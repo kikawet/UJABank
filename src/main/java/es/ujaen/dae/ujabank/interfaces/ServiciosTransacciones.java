@@ -5,8 +5,6 @@
  */
 package es.ujaen.dae.ujabank.interfaces;
 
-import es.ujaen.dae.ujabank.entidades.Transaccion;
-import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
 import java.util.Date;

@@ -15,15 +15,10 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  *
@@ -43,7 +38,7 @@ public class Cuenta implements Serializable {
     Usuario propietario;
 
     @JoinTable(name = "transacciones"
-//            ,schema = "aptatas"
+    //            ,schema = "aptatas"
     )//marcar el id es para confirmar 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     /*No se puede indexar por fecha este historial pero se puede @OrderColumn

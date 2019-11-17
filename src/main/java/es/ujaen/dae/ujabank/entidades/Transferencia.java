@@ -8,17 +8,15 @@ package es.ujaen.dae.ujabank.entidades;
 import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import java.io.Serializable;
 import javax.persistence.Entity;
-import javax.persistence.Table;
-
 
 /**
  *
  * @author axpos
  */
-@Entity 
+@Entity
 
 public class Transferencia extends Transaccion implements Serializable {
-    
+
     private int idOrigen;
     private int idDestino;
     private String concepto;
@@ -26,7 +24,7 @@ public class Transferencia extends Transaccion implements Serializable {
     public Transferencia() {
 
     }
-    
+
     public String getConcepto() {
         return concepto;
     }

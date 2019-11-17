@@ -1,3 +1,8 @@
+Práctica 2 acabada
+
 ## TODO
-* copiar menu
-* limpiar
+- [x] mappear
+- [x] aislamiento
+- [x] cache
+- [x] copiar menu
+- [x] limpiar

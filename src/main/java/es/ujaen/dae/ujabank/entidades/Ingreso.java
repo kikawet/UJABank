@@ -9,14 +9,13 @@ import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import java.io.Serializable;
 import javax.persistence.Entity;
 
-
 /**
  *
  * @author axpos
  */
 @Entity
 public class Ingreso extends Transaccion implements Serializable {
-   
+
     private int idOrigen;
     private int idDestino;
 
