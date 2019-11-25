@@ -5,7 +5,6 @@
  */
 package es.ujaen.dae.ujabank;
 
-import es.ujaen.dae.ujabank.cliente.Cliente;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -26,9 +25,5 @@ public class UJABank {
         ApplicationContext contexto = servidor.run(args);
 
         System.out.println("Servidor iniciado");
-
-        Cliente c = new Cliente();
-        c.run(contexto);
-
     }
 }
