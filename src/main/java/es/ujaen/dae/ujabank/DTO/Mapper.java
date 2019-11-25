@@ -10,7 +10,7 @@ import es.ujaen.dae.ujabank.entidades.Ingreso;
 import es.ujaen.dae.ujabank.entidades.Retiro;
 import es.ujaen.dae.ujabank.entidades.Transferencia;
 import es.ujaen.dae.ujabank.entidades.Usuario;
-import es.ujaen.dae.ujabank.interfaces.Transaccion;
+import es.ujaen.dae.ujabank.entidades.Transaccion;
 
 /**
  *
@@ -48,7 +48,7 @@ public class Mapper {
         }
 
         DTOCuenta dtoCuenta = new DTOCuenta();
-        dtoCuenta.setId(cuenta.getId());
+        dtoCuenta.setId(cuenta.getID());
         dtoCuenta.setSaldo(cuenta.getSaldo());
         return dtoCuenta;
     }
@@ -74,7 +74,7 @@ public class Mapper {
             dtoTransaccion.setOrigen(t.getIDOrigen());
             dtoTransaccion.setDestino(t.getIDDestino());
             dtoTransaccion.setConcepto(t.getConcepto());
-            dtoTransaccion.setTipo(DTOTransaccion.TIPO.retiro);
+            dtoTransaccion.setTipo(DTOTransaccion.TIPO.transferencia);
 
         } else {
             Retiro r = (Retiro) transaccion;

@@ -5,7 +5,7 @@
  */
 package es.ujaen.dae.ujabank.interfaces;
 
-import es.ujaen.dae.ujabank.DTO.DTOCuenta;
+import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
 import java.util.Date;
 import java.util.List;
@@ -23,5 +23,5 @@ public interface ServiciosTransacciones {
 
     public boolean retirar(UUID token, int idOrigen, Tarjeta destino, float cantidad);
 
-    public List<Transaccion> consultar(UUID token, int idCuenta, Date inicio, Date fin);
+    public List<DTOTransaccion> consultar(UUID token, int idCuenta, Date inicio, Date fin);
 }

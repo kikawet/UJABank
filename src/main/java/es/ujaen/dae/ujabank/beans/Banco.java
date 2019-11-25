@@ -5,36 +5,36 @@
  */
 package es.ujaen.dae.ujabank.beans;
 
-import es.ujaen.dae.ujabank.excepciones.formato.UsuarioIncorrecto;
-import es.ujaen.dae.ujabank.excepciones.formato.TokenIncorrecto;
-import es.ujaen.dae.ujabank.excepciones.formato.TarjetaIncorrecta;
-import es.ujaen.dae.ujabank.excepciones.formato.FechaIncorrecta;
-import es.ujaen.dae.ujabank.excepciones.formato.CuentaIncorrecta;
-import es.ujaen.dae.ujabank.excepciones.formato.ConceptoIncorrecto;
-import es.ujaen.dae.ujabank.excepciones.formato.CantidadNegativa;
 import es.dae.ujaen.euroujacoinrate.EuroUJACoinRate;
+import es.ujaen.dae.ujabank.DAO.DAOCuenta;
+import es.ujaen.dae.ujabank.DAO.DAOUsuario;
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
+import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.DTO.Mapper;
-import es.ujaen.dae.ujabank.entidades.Cuenta;
-import es.ujaen.dae.ujabank.entidades.Ingreso;
-import es.ujaen.dae.ujabank.entidades.Retiro;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
-import es.ujaen.dae.ujabank.entidades.Transferencia;
+import es.ujaen.dae.ujabank.entidades.Cuenta;
+import es.ujaen.dae.ujabank.entidades.Transaccion;
 import es.ujaen.dae.ujabank.entidades.Usuario;
+import es.ujaen.dae.ujabank.excepciones.*;
+import es.ujaen.dae.ujabank.excepciones.formato.CantidadNegativa;
+import es.ujaen.dae.ujabank.excepciones.formato.ConceptoIncorrecto;
+import es.ujaen.dae.ujabank.excepciones.formato.CuentaIncorrecta;
+import es.ujaen.dae.ujabank.excepciones.formato.FechaIncorrecta;
+import es.ujaen.dae.ujabank.excepciones.formato.TarjetaIncorrecta;
+import es.ujaen.dae.ujabank.excepciones.formato.TokenIncorrecto;
+import es.ujaen.dae.ujabank.excepciones.formato.UsuarioIncorrecto;
 import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
-import es.ujaen.dae.ujabank.interfaces.Transaccion;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import es.ujaen.dae.ujabank.excepciones.*;
 
 /**
  *
@@ -43,15 +43,16 @@ import es.ujaen.dae.ujabank.excepciones.*;
 @Component
 public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
-    private final List<Usuario> _usuariosBanco;
-    private final Map<Integer, Cuenta> _cuentasBanco;
+    @Autowired
+    private DAOUsuario usuariosBanco;
+
+    @Autowired
+    private DAOCuenta cuentasBanco;
     private final Map<UUID, Usuario> _tokensActivos;
 
     private static final EuroUJACoinRate euro_UJACoin = new EuroUJACoinRate();
 
     public Banco() {
-        this._usuariosBanco = new ArrayList<>();
-        this._cuentasBanco = new HashMap<>();
         this._tokensActivos = new TreeMap<>();
     }
 
@@ -79,30 +80,21 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CantidadNegativa();
         }
 
-        Cuenta cuenta = this._cuentasBanco.get(idDestino);
+        Cuenta cuenta = this.cuentasBanco.buscar(idDestino);
 
-//        Tarjeta tarjeta = Mapper.tarjetaMapper(origen);
         if (cuenta == null) {
             throw new CuentaIncorrecta();
         }
 
-        if (!usuario.containsCuenta(cuenta)) {
+        if (!usuario.equals(cuenta.getPropietario())) {
             throw new CuentaNoPerteneceUsuario();
         }
 
-        origen.retirar(cantidad);//deshacer transsacion si es necesario
+        origen.retirar(cantidad);
 
         cantidad *= euro_UJACoin.euroToUJACoinToday();
 
-        Ingreso ingreso = new Ingreso();
-        ingreso.setFecha(new Date());
-        ingreso.setCantidad(cantidad);
-        ingreso.setOrigen(origen.getNumero());
-        ingreso.setIDDestino(cuenta.getId());
-
-        boolean ingresado = cuenta.ingresar(ingreso);
-
-        return ingresado;
+        return this.cuentasBanco.ingresar(origen, cuenta, cantidad) != null;
     }
 
     @Override
@@ -133,14 +125,14 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ConceptoIncorrecto();
         }
 
-        Cuenta cOrigen = this._cuentasBanco.get(idOrigen);
-        Cuenta cDestino = this._cuentasBanco.get(idDestino);
+        Cuenta cOrigen = this.cuentasBanco.buscar(idOrigen);
+        Cuenta cDestino = this.cuentasBanco.buscar(idDestino);
 
         if (cOrigen == null) {
             throw new CuentaIncorrecta();
         }
 
-        if (!usuario.containsCuenta(cOrigen)) {
+        if (!usuario.equals(cOrigen.getPropietario())) {
             throw new ErrorAutorizacion();
         }
 
@@ -153,18 +145,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
 //        cantidad = EuroUJACoinRate... // no es necesario entre cuentas
-        Transferencia transferencia = new Transferencia();
-
-        transferencia.setFecha(new Date());
-        transferencia.setIDOrigen(cOrigen.getId());
-        transferencia.setIDDestino(cDestino.getId());
-        transferencia.setCantidad(cantidad);
-        transferencia.setConcepto(concepto);
-
-        boolean transferido = cOrigen.transferir(transferencia) && cDestino.transferir(transferencia); // hacer dos pasos si hace falta deshacer
-
-        //deshacer si es necesario
-        return transferido;
+        return this.cuentasBanco.transferir(cOrigen, cDestino, cantidad, concepto) != null;
     }
 
     @Override
@@ -191,13 +172,13 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CantidadNegativa();
         }
 
-        Cuenta cuenta = this._cuentasBanco.get(idOrigen);
+        Cuenta cuenta = this.cuentasBanco.buscar(idOrigen);
 
         if (cuenta == null) {
             throw new CuentaIncorrecta();
         }
 
-        if (!usuario.containsCuenta(cuenta)) {
+        if (!usuario.equals(cuenta.getPropietario())) {
             throw new ErrorAutorizacion();
         }
 
@@ -205,24 +186,17 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CuentaSaldoInsuficiente();
         }
 
-        Retiro retiro = new Retiro();
-
-        retiro.setFecha(new Date());
-        retiro.setIDOrigen(cuenta.getId());
-        retiro.setDestino(destino.getNumero());
-        retiro.setCantidad(cantidad);
-
-        boolean retirado = cuenta.retirar(retiro);
+        boolean retiro = this.cuentasBanco.retirar(cuenta, destino, cantidad) != null;
 
         cantidad *= euro_UJACoin.ujaCoinToEuroToday();
         destino.ingresar(cantidad);
 
         //si no se ha ingresado deshacer
-        return retirado;
+        return retiro;
     }
 
     @Override
-    public List<Transaccion> consultar(UUID token, int idCuenta, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
+    public List<DTOTransaccion> consultar(UUID token, int idCuenta, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
         if (token == null) {
             throw new TokenIncorrecto();
         }
@@ -249,21 +223,26 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ErrorAutorizacion();
         }
 
-        Cuenta cuenta = this._cuentasBanco.get(idCuenta);
+        Cuenta cuenta = this.cuentasBanco.buscar(idCuenta);
 
         if (cuenta == null) {
             throw new CuentaIncorrecta();
         }
 
-        if (!usuario.containsCuenta(cuenta)) {
+        if (!usuario.equals(cuenta.getPropietario())) {
             throw new ErrorAutorizacion();
         }
 
-        return cuenta.consultar(inicio, fin);
+        List<Transaccion> transacciones = this.cuentasBanco.consultarTransacciones(cuenta, inicio, fin);
+        List<DTOTransaccion> dtoTransacciones = new ArrayList<>();
+        transacciones.forEach((transaccion) -> {
+            dtoTransacciones.add(Mapper.dtoTransaccionMapper(transaccion));
+        });
+        return dtoTransacciones;
     }
 
     @Override
-    public boolean registrar(DTOUsuario u, String contasena) throws InvalidParameterException {
+    public void registrar(DTOUsuario u, String contasena) throws InvalidParameterException {
         if (u == null) {
             throw new UsuarioIncorrecto();
         }
@@ -278,26 +257,22 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         Usuario usuario = Mapper.usuarioMapper(u);
         usuario.setContrasena(contasena);
-        boolean insertado = false;
-        if (!this._usuariosBanco.contains(usuario)) {
-            Cuenta cuenta = new Cuenta();
-            usuario.addCuenta(cuenta);
-            insertado = this._usuariosBanco.add(usuario) && this._cuentasBanco.put(cuenta.getId(), cuenta) != null;
 
-            if (!insertado) {
-                this._usuariosBanco.remove(usuario);
-                this._cuentasBanco.remove(cuenta.getId());
-            }
+        if (!this.usuariosBanco.contiene(usuario)) {
+            this.usuariosBanco.insertar(usuario);// al insertar si al añadir la cuenta da error lanza excepcion aqui
+            Cuenta cuenta = cuentasBanco.crear(0, usuario);
+
+            usuario.addCuenta(cuenta);
+            this.usuariosBanco.actualizar(usuario);
         } else {
             throw new UsuarioIncorrecto();
         }
 
-        return insertado;
     }
 
     @Override
-    public UUID login(DTOUsuario usuario, String contrasena) throws InvalidParameterException, IllegalAccessError {
-        if (usuario == null) {
+    public UUID login(DTOUsuario usuarioDTO, String contrasena) throws InvalidParameterException, IllegalAccessError {
+        if (usuarioDTO == null) {
             throw new UsuarioIncorrecto();
         }
 
@@ -309,19 +284,18 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ContrasenaIncorrecta();
         }
 
-        int indiceUsuario = this._usuariosBanco.indexOf(Mapper.usuarioMapper(usuario));
+        Usuario usuario = this.usuariosBanco.buscar(usuarioDTO.getDni());
 
-        if (indiceUsuario == -1) {
+        if (usuario == null) {
             throw new ErrorAutorizacion();
         }
-
-        if (this._usuariosBanco.get(indiceUsuario).getContrasena() == null ? contrasena == null : !this._usuariosBanco.get(indiceUsuario).getContrasena().equals(contrasena)) {
+        if (!usuario.getContrasena().equals(contrasena)) {
             throw new ContrasenaIncorrecta();
         }
 
         UUID token = UUID.randomUUID();
 
-        this._tokensActivos.put(token, this._usuariosBanco.get(indiceUsuario));
+        this._tokensActivos.put(token, usuario);
 
         return token;
     }
@@ -338,15 +312,9 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ErrorAutorizacion();
         }
 
-        Cuenta cuenta = new Cuenta();
+        Cuenta cuenta = cuentasBanco.crear(0, usuario);
 
-        boolean insertado = usuario.addCuenta(cuenta);
-
-        if (insertado) {
-            this._cuentasBanco.put(cuenta.getId(), cuenta);
-        }
-
-        return this._cuentasBanco.put(cuenta.getId(), cuenta) != null;
+        return cuenta != null;
     }
 
     @Override
@@ -359,12 +327,14 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ErrorAutorizacion();
         }
 
-        ArrayList<DTOCuenta> cuentas = new ArrayList<>();
+        ArrayList<DTOCuenta> cuentasDTO = new ArrayList<>();
 
-        this._tokensActivos.get(token).getCuentas().forEach((Cuenta cuenta) -> {
-            cuentas.add(Mapper.dtoCuentaMapper(cuenta));
+        List<Cuenta> cuentas = this.usuariosBanco.getCuentas(this._tokensActivos.get(token));
+
+        cuentas.forEach((Cuenta cuenta) -> {
+            cuentasDTO.add(Mapper.dtoCuentaMapper(cuenta));
         });
 
-        return cuentas;
+        return cuentasDTO;
     }
 }

@@ -6,16 +6,16 @@
 package es.ujaen.dae.ujabank.cliente;
 
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
+import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
-import es.ujaen.dae.ujabank.entidades.Ingreso;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
+import es.ujaen.dae.ujabank.cliente.menu.ConsoleUtils;
+import es.ujaen.dae.ujabank.cliente.menu.Menu;
+import es.ujaen.dae.ujabank.cliente.menu.MenuItem;
 import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
-import es.ujaen.dae.ujabank.interfaces.Transaccion;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -34,11 +34,22 @@ public class Cliente {
 
     private final DTOUsuario usuario;
     private List<DTOCuenta> cuentas;
-    private List<Tarjeta> tarjetas;
+    private final List<Tarjeta> tarjetas;
 
     UUID tokenUsuario;
 
+    ServiciosUsuario sUsuarios;
+    ServiciosTransacciones sTrans;
+
+    BufferedReader input;
+
+    SimpleDateFormat sdf;
+
     public Cliente() {
+        input = new BufferedReader(new InputStreamReader(System.in));
+
+        sdf = new SimpleDateFormat("dd/MM/yyyy");
+        sdf.setLenient(false);
         usuario = new DTOUsuario();
 
         usuario.setDni("56555555Z");
@@ -59,295 +70,316 @@ public class Cliente {
         }
     }
 
+    void modificarDatos() {
+//        System.out.println("Modificando el usuario, tus datos actuales son:");
+        ConsoleUtils.println("-Nombre: " + usuario.getNombre());
+        ConsoleUtils.println("-DNI: " + usuario.getDni());
+        ConsoleUtils.println("-Domicilio: " + usuario.getDomicilio());
+        ConsoleUtils.println("-Fecha de nacimiento: " + sdf.format(usuario.getfNacimiento()));
+        ConsoleUtils.println("-Telefono: " + usuario.getTelefono());
+        ConsoleUtils.println("-Email: " + usuario.getEmail());
+
+        ConsoleUtils.println("\n--------------------------------------\n");
+        ConsoleUtils.println("Introduce tus nuevos datos: ");
+
+//        System.out.print("+Nombre: ");
+//        dato = input.readLine();
+        usuario.setNombre(ConsoleUtils.getStringField("Nombre"));
+
+//        System.out.print("\t+DNI: ");
+//        dato = input.readLine();
+        usuario.setDni(ConsoleUtils.getStringField("DNI"));
+
+//        System.out.print("\t+Domicilio: ");
+//        dato = input.readLine();
+        usuario.setDomicilio(ConsoleUtils.getStringField("Domicilio"));
+
+//        System.out.print("\t+Fecha de nacimiento (dd/mm/yyyy): ");
+//        dato = input.readLine();
+        usuario.setfNacimiento(ConsoleUtils.getDateField("Fecha de nacimiento"));
+
+//        System.out.print("\t+Telefono: ");
+//        dato = input.readLine();
+        usuario.setTelefono(ConsoleUtils.getStringField("Telefono"));
+
+//        System.out.print("\t+Email: ");
+//        dato = input.readLine();
+        usuario.setEmail(ConsoleUtils.getStringField("Email"));
+
+        ConsoleUtils.println("\n--------------------------------------\n");
+        ConsoleUtils.println("Tus nuevos datos: ");
+
+        ConsoleUtils.println("-Nombre: " + usuario.getNombre());
+        ConsoleUtils.println("-DNI: " + usuario.getDni());
+        ConsoleUtils.println("-Domicilio: " + usuario.getDomicilio());
+        ConsoleUtils.println("-Fecha de nacimiento: " + sdf.format(usuario.getfNacimiento()));
+        ConsoleUtils.println("-Telefono: " + usuario.getTelefono());
+        ConsoleUtils.println("-Email: " + usuario.getEmail());
+
+    }
+
+    void mostrarCuentas() {
+        cuentas = sUsuarios.consultarCuentas(tokenUsuario);
+//        System.out.println("\n--------------------------------------\n");
+        if (cuentas.isEmpty()) {
+            ConsoleUtils.println("Aun no tienes nungna cuenta en UJAbank");
+        } else {
+            cuentas.forEach((cuenta) -> {
+                ConsoleUtils.print("-ID: " + cuenta.getId() + "\t");
+                ConsoleUtils.println("- Saldo (UJAC): " + cuenta.getSaldo());
+            });
+            ConsoleUtils.print("Esas son todas tu cuentas y su saldo");
+        }
+    }
+
+    void registrar() {
+        ConsoleUtils.println("Registrando usuario con nombre : " + usuario.getNombre());
+//                        ConsoleUtils.print("Introduce la contraseña: ");
+
+        String contrasena = ConsoleUtils.getStringField("Introduce la contraseña");
+
+        sUsuarios.registrar(usuario, contrasena);
+
+//                        if (registro) {
+        ConsoleUtils.print("El registro se realizó con exito");
+    }
+
+    void login() {
+        ConsoleUtils.println("Haciendo el login para el usuario: " + usuario.getNombre());
+//        ConsoleUtils.print("Introduce la contraseña: ");
+
+        String contrasena = ConsoleUtils.getStringField("Introduce la contraseña");
+        tokenUsuario = sUsuarios.login(usuario, contrasena);
+
+        ConsoleUtils.println("Usuario logeado con éxito");
+
+        ConsoleUtils.println("Sincronizando tus cuentas ...");
+        cuentas = sUsuarios.consultarCuentas(tokenUsuario);
+        ConsoleUtils.print(" ... cuentras sincronizadas");
+    }
+
+    void crearCuenta() {
+        this.borrarConsola();
+
+        if (tokenUsuario == null) {
+            ConsoleUtils.println("Error: Necesitas logearte para continuar.");
+            return;
+        }
+
+        ConsoleUtils.println("Creando cuenta ...");
+
+        boolean cuentaCreada = sUsuarios.crearCuenta(tokenUsuario);
+
+        if (!cuentaCreada) {
+            ConsoleUtils.println("\t-Hubo algún error al crear la cuenta");
+        } else {
+            ConsoleUtils.println("\t-Cuenta creada con éxito");
+        }
+    }
+
+    void ingresar() {
+        this.borrarConsola();
+
+        if (tokenUsuario == null) {
+            ConsoleUtils.print("Error: Solamente puedes realizar un ingreso si estás logeado");
+            return;
+        }
+
+        if (tarjetas.isEmpty()) {
+            ConsoleUtils.print("Error: No se puede realizar un ingreso sin ninguna tarjeta");
+            return;
+        }
+
+        ConsoleUtils.println("*** Vas a realizar un ingreso *** ");
+        float cantidad;
+        int tarjetaIngreso,
+                cuentaIngreso;
+
+        ConsoleUtils.println("Sincronizando tus cuentas ...");
+        cuentas = sUsuarios.consultarCuentas(tokenUsuario);
+        ConsoleUtils.print(" ... cuentras sincronizadas");
+
+        tarjetaIngreso = ConsoleUtils.getIntFieldWithLimits("Elige el índice de la tarjeta a usar (tienes " + tarjetas.size() + " tarjetas) ",
+                0,//from 
+                tarjetas.size() - 1);//to
+//         Integer.parseInt(input.readLine());
+
+//        System.out.print();
+        cuentaIngreso = ConsoleUtils.getIntFieldWithLimits("Elige el índice de la cuenta a la que ingresar (tienes " + cuentas.size() + " cuentas) ",
+                0,//from 
+                cuentas.size() - 1);//to
+
+        cantidad = ConsoleUtils.getFloatField("Introduce la cantidad de euros que deseas ingrear ");
+
+        ConsoleUtils.println("Realizando ingreso ...");
+
+        boolean ingreso = sTrans.ingresar(tokenUsuario, tarjetas.get(tarjetaIngreso), cuentas.get(cuentaIngreso).getId(), cantidad);
+
+        if (ingreso) {
+            ConsoleUtils.println("El ingreso se realizó con éxito");
+        } else {
+            ConsoleUtils.println("Hubo un error en la transacción");
+        }
+    }
+
+    void transferir() {
+        this.borrarConsola();
+
+        if (tokenUsuario == null) {
+            ConsoleUtils.println("Error: Necesitras estar logeado para realizar una transferencia");
+            return;
+        }
+
+        ConsoleUtils.println("*** Vas a realizar una transferencia ***");
+
+        ConsoleUtils.println("Sincronizando tus cuentas ...");
+        cuentas = sUsuarios.consultarCuentas(tokenUsuario);
+        ConsoleUtils.print(" ... cuentras sincronizadas");
+
+        float cantidad;
+        int cuentaOrigen,
+                idCuentaDestino;
+        String concepto;
+
+        cuentaOrigen = ConsoleUtils.getIntFieldWithLimits("Elige el índice de la cuenta del origen de transferencia (tienes " + cuentas.size() + " cuentas) ",
+                0,
+                cuentas.size() - 1);
+
+        idCuentaDestino = ConsoleUtils.getIntField("Indica el ID de la cuenta de destino de transferencia ");
+        cantidad = ConsoleUtils.getFloatField("Indica la cantidad de UJACoins que quieres transferir ");
+        concepto = ConsoleUtils.getStringField("Indica el concepto de la transferencia ");
+
+        ConsoleUtils.println("Realizando transferencia ...");
+
+        boolean transferido = sTrans.transferir(tokenUsuario, cuentas.get(cuentaOrigen).getId(), idCuentaDestino, cantidad, concepto);
+
+        if (transferido) {
+            ConsoleUtils.print("La transferencia se realizó correctamente");
+        } else {
+            ConsoleUtils.print("Hubo un fallo en la transferencia");
+        }
+    }
+
+    void retirar() {
+        this.borrarConsola();
+
+        if (tokenUsuario == null) {
+            ConsoleUtils.println("Error: Necesitas estar logeado para realizar un retiro");
+            return;
+        }
+
+        ConsoleUtils.println("*** Vas a realizar un retiro ***");
+
+        ConsoleUtils.println("Sincronizando tus cuentas ...");
+        cuentas = sUsuarios.consultarCuentas(tokenUsuario);
+        ConsoleUtils.print(" ... cuentras sincronizadas");
+
+        float cantidad;
+        int tarjetaRetiro,
+                cuentaRetiro;
+
+        cuentaRetiro = ConsoleUtils.getIntFieldWithLimits("Elige el índice de la cuenta desde la que retirar (tienes " + cuentas.size() + " cuentas) ",
+                0,
+                cuentas.size() - 1);
+
+        tarjetaRetiro = ConsoleUtils.getIntFieldWithLimits("Elige el índice de la tarjeta a usar (tienes " + tarjetas.size() + " tarjetas) ",
+                0,
+                tarjetas.size() - 1);
+
+        cantidad = ConsoleUtils.getFloatField("Indica la cantidad de UJACoins que quieres retirar ");
+
+        boolean retiro = sTrans.retirar(tokenUsuario, cuentas.get(cuentaRetiro).getId(), tarjetas.get(tarjetaRetiro), cantidad);
+
+        if (retiro) {
+            ConsoleUtils.print("El retiro se realizó con éxito");
+        } else {
+            ConsoleUtils.print("Hubo un error al retirar el dinero");
+        }
+    }
+
+    void consultarMovimientos() {
+        this.borrarConsola();
+
+        if (tokenUsuario == null) {
+            ConsoleUtils.println("Error: Necesitas estar logeado para consultar moviemientos de una cuenta");
+            return;
+        }
+
+        ConsoleUtils.println("*** Consultando movimientos ***");
+
+        int posCuenta;
+        Date fInicio,
+                fFin;
+
+        posCuenta = ConsoleUtils.getIntFieldWithLimits("Introduce el índice de la cuenta que quieres consultar (tienes " + cuentas.size() + " cuentas) ",
+                0,
+                cuentas.size() - 1);
+        fInicio = ConsoleUtils.getDateField("Introduce la fecha de inicio (dd/mm/yyyy) ");
+        fFin = ConsoleUtils.getDateField("Introduce la fecha de fin (dd/mm/yyyy) ");
+
+        List<DTOTransaccion> operaciones = sTrans.consultar(tokenUsuario, cuentas.get(posCuenta).getId(), fInicio, fFin);
+
+        if (operaciones.isEmpty()) {
+            ConsoleUtils.println("No se ha hecho ninguna operación entre esas fechas ");
+        } else {
+            ConsoleUtils.println("------------------");
+            operaciones.forEach((transaccion) -> {
+
+                switch (transaccion.getTipo()) {
+                    case ingreso:
+                        ConsoleUtils.println("Ingreso:");
+                        break;
+                    case transferencia:
+                        ConsoleUtils.println("Transferencia:");
+                        break;
+                    case retiro:
+                        ConsoleUtils.println("Retiro:");
+                        break;
+                }
+
+                ConsoleUtils.println("\tId Origen: " + transaccion.getOrigen());
+                ConsoleUtils.println("\tId Destino: " + transaccion.getDestino());
+                ConsoleUtils.println("\tFecha: " + transaccion.getFecha().toString());
+                ConsoleUtils.println("\tCantidad: " + transaccion.getCantidad());
+
+                if (transaccion.getTipo() == DTOTransaccion.TIPO.transferencia) {
+                    ConsoleUtils.println("Concepto: " + transaccion.getConcepto());
+                }
+
+                ConsoleUtils.println("------------------");
+            });
+        }
+
+    }
+
     public void run(ApplicationContext contexto) {
-        ServiciosUsuario sUsuarios = (ServiciosUsuario) contexto.getBean("banco");
-        ServiciosTransacciones sTrans = (ServiciosTransacciones) contexto.getBean("banco");
+        this.sUsuarios = (ServiciosUsuario) contexto.getBean("banco");
+        this.sTrans = (ServiciosTransacciones) contexto.getBean("banco");
 
-        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-        int opcion = 0;
+        Menu menu = new Menu("Salir", "Volver");
+        menu.setTitle("*** Cliente UJABANK ***");
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        sdf.setLenient(false);
+        menu.addItem(new MenuItem("Modificar datos de usuario", this::modificarDatos));
+        menu.addItem(new MenuItem("Registrar usuario", this::registrar));
+        menu.addItem(new MenuItem("Iniciar sesión (registrado)", this::login));
+        menu.addItem(new MenuItem("Mostrar tus cuentas (logeado)", this::mostrarCuentas));
+        menu.addItem(new MenuItem("Crear cuenta nueva (logeado)", this::crearCuenta));
+        menu.addItem(new MenuItem("Ingresar (logeado)", this::ingresar));
+        menu.addItem(new MenuItem("Transferir (logeado)", this::transferir));
+        menu.addItem(new MenuItem("Retirar (logeado)", this::retirar));
+        menu.addItem(new MenuItem("Consultar trsnsferencias (logeado)", this::consultarMovimientos));
 
-        borrarConsola();
-        while (opcion != -1) {
-            try {
-                //Menu
-                System.out.println("Cual de estas opciones quieres realizar:");
-                System.out.println("1: Modificar datos de usuario");
-                System.out.println("2: Mostrar tus cuentas (logeado)");
-                System.out.println("3: Registrar usuario");
-                System.out.println("4: Login de usuario (registrado)");
-                System.out.println("5: Crear una nueva cuenta (logeado)");
-                System.out.println("6: ingresar dinero (logeado)");
-                System.out.println("7: transferir dinero (logeado)");
-                System.out.println("8: retirar dinero (logeado)");
-                System.out.println("9: consultar movimientos (logeado)");
-                System.out.println("otro: salir");
+        try {
 
-                opcion = Integer.parseInt(input.readLine());
+            menu.execute();
 
-                borrarConsola();
-                switch (opcion) {
-                    case 1: //Modificar datos
-                        String dato;
-
-                        System.out.println("Modificando el usuario, tus datos actuales son:");
-                        System.out.println("-Nombre: " + usuario.getNombre());
-                        System.out.println("-DNI: " + usuario.getDni());
-                        System.out.println("-Domicilio: " + usuario.getDomicilio());
-                        System.out.println("-Fecha de nacimiento: " + sdf.format(usuario.getfNacimiento()));
-                        System.out.println("-Telefono: " + usuario.getTelefono());
-                        System.out.println("-Email: " + usuario.getEmail());
-
-                        System.out.println("\n--------------------------------------\n");
-                        System.out.println("Introduce tus nuevos datos: ");
-
-                        System.out.print("\t+Nombre: ");
-                        dato = input.readLine();
-                        usuario.setNombre(dato);
-
-                        System.out.print("\t+DNI: ");
-                        dato = input.readLine();
-                        usuario.setDni(dato);
-
-                        System.out.print("\t+Domicilio: ");
-                        dato = input.readLine();
-                        usuario.setDomicilio(dato);
-
-                        System.out.print("\t+Fecha de nacimiento (dd/mm/yyyy): ");
-                        dato = input.readLine();
-                        usuario.setfNacimiento(sdf.parse(dato));
-
-                        System.out.print("\t+Telefono: ");
-                        dato = input.readLine();
-                        usuario.setTelefono(dato);
-
-                        System.out.print("\t+Email: ");
-                        dato = input.readLine();
-                        usuario.setEmail(dato);
-
-                        System.out.println("\n--------------------------------------\n");
-                        System.out.println("Tus nuevos datos: ");
-
-                        System.out.println("-Nombre: " + usuario.getNombre());
-                        System.out.println("-DNI: " + usuario.getDni());
-                        System.out.println("-Domicilio: " + usuario.getDomicilio());
-                        System.out.println("-Fecha de nacimiento: " + sdf.format(usuario.getfNacimiento()));
-                        System.out.println("-Telefono: " + usuario.getTelefono());
-                        System.out.println("-Email: " + usuario.getEmail());
-
-                        break;
-                    case 2: // Mostrar tus cuentas
-                        cuentas = sUsuarios.consultarCuentas(tokenUsuario);
-                        System.out.println("\n--------------------------------------\n");
-                        if (cuentas.isEmpty()) {
-                            System.out.print("Aun no tienes nungna cuenta en UJAbank");
-                        } else {
-                            cuentas.forEach((cuenta) -> {
-                                System.out.print("-ID: " + cuenta.getId() + "\t");
-                                System.out.println("- Saldo (UJAC): " + cuenta.getSaldo());
-                            });
-                            System.out.print("Esas son todas tu cuentas y su saldo");
-                        }
-                        break;
-                    case 3:// Registrar usuario
-                        String contrasena;
-                        System.out.println("Registrando usuario con nombre : " + usuario.getNombre());
-                        System.out.print("Introduce la contraseña: ");
-
-                        contrasena = input.readLine();
-
-                        boolean registro = sUsuarios.registrar(usuario, contrasena);
-
-                        if (registro) {
-                            System.out.print("El registro se realizó con exito");
-                        } else {
-                            System.out.print("Hubo un erro al crear el usuario");
-                        }
-
-                        break;
-                    case 4:// Login usuario
-//                        String contrasena;
-                        System.out.println("Haciendo el login para el usuario: " + usuario.getNombre());
-                        System.out.print("Introduce la contraseña: ");
-
-                        contrasena = input.readLine();
-                        tokenUsuario = sUsuarios.login(usuario, contrasena);
-
-                        System.out.println("Usuario logeado con éxito");
-
-                        System.out.println("Sincronizando tus cuentas ...");
-                        cuentas = sUsuarios.consultarCuentas(tokenUsuario);
-                        System.out.print(" ... cuentras sincronizadas");
-
-                        break;
-                    case 5:// Crear cuenta
-                        System.out.println("Creando una cuenta :");
-                        if (tokenUsuario == null) {
-                            System.out.println("Necesitas logearte para continuar.");
-                            break;
-                        }
-                        System.out.println("Enviando solicitud ...");
-
-                        boolean cuentaCreada = sUsuarios.crearCuenta(tokenUsuario);
-
-                        if (!cuentaCreada) {
-                            System.out.print("\t-Hubo algún error al crear la cuenta");
-                        } else {
-                            System.out.println("\t-Cuenta creada con éxito");
-                        }
-                        break;
-                    case 6:// Ingresar dinero
-                        if (tokenUsuario == null) {
-                            System.out.print("Solamente puedes realizar un ingreso si estás logeado");
-                            break;
-                        }
-
-                        if (tarjetas.isEmpty()) {
-                            System.out.print("No se puede realizar un ingreso sin ninguna tarjeta");
-                            break;
-                        }
-
-                        System.out.println("Vas a realizar un ingreso: ");
-                        float cantidad;
-                        int tarjetaIngreso,
-                         cuentaIngreso;
-
-                        System.out.print("Elige el índice de la tarjeta a usar (tienes " + tarjetas.size() + " tarjetas): ");
-                        tarjetaIngreso = Integer.parseInt(input.readLine());
-
-                        System.out.print("Elige el índice de la cuenta a la que ingresar (tienes " + cuentas.size() + " cuentas): ");
-                        cuentaIngreso = Integer.parseInt(input.readLine());
-
-                        System.out.print("Introduce la cantidad de euros que deseas ingrear: ");
-                        cantidad = Float.parseFloat(input.readLine());
-
-                        System.out.println("Realizando ingreso ...");
-
-                        boolean ingreso = sTrans.ingresar(tokenUsuario, tarjetas.get(tarjetaIngreso), cuentas.get(cuentaIngreso).getId(), cantidad);
-
-                        if (ingreso) {
-                            System.out.print("El ingreso se realizó con éxito");
-                        } else {
-                            System.out.print("Hubo un error en la transacción");
-                        }
-
-                        break;
-                    case 7:// Transferir dinero
-                        if (tokenUsuario == null) {
-                            System.out.println("Necesitras estar logeado para realizar una transferencia");
-                            break;
-                        }
-
-                        System.out.println("Vas a realizar una transferencia");
-
-                        int cuentaOrigen,
-                         idCuentaDestino;
-                        String concepto;
-                        System.out.print("Elige el índice de la cuenta del origen de transferencia (tienes " + cuentas.size() + " cuentas): ");
-                        cuentaOrigen = Integer.parseInt(input.readLine());
-
-                        System.out.print("Indica el ID de la cuenta de destino de transferencia: ");
-                        idCuentaDestino = Integer.parseInt(input.readLine());
-
-                        System.out.print("Indica la cantidad de UJACoins que quieres transferir: ");
-                        cantidad = Float.valueOf(input.readLine());
-
-                        System.out.print("Indica el concepto de la transferencia: ");
-                        concepto = input.readLine();
-
-                        System.out.println("Realizando transferencia ...");
-
-                        boolean transferido = sTrans.transferir(tokenUsuario, cuentas.get(cuentaOrigen).getId(), idCuentaDestino, cantidad, concepto);
-
-                        if (transferido) {
-                            System.out.print("La transferencia se realizó correctamente");
-                        } else {
-                            System.out.print("Hubo un fallo en la transferencia");
-                        }
-
-                        break;
-                    case 8:// Retirar dinero
-                        if (tokenUsuario == null) {
-                            System.out.println("Necesitas estar logeado para realizar un retiro");
-                            break;
-                        }
-
-                        System.out.println("Vas a realizar un retiro:");
-
-                        int tarjetaRetiro,
-                         cuentaRetiro;
-
-                        System.out.print("Elige el índice de la cuenta desde la que retirar (tienes " + cuentas.size() + " cuentas): ");
-                        cuentaRetiro = Integer.parseInt(input.readLine());
-
-                        System.out.print("Elige el índice de la tarjeta a usar (tienes " + tarjetas.size() + " tarjetas): ");
-                        tarjetaRetiro = Integer.parseInt(input.readLine());
-
-                        System.out.print("Indica la cantidad de UJACoins que quieres retirar: ");
-                        cantidad = Float.valueOf(input.readLine());
-
-                        boolean retiro = sTrans.retirar(tokenUsuario, cuentas.get(cuentaRetiro).getId(), tarjetas.get(tarjetaRetiro), cantidad);
-
-                        if (retiro) {
-                            System.out.print("El retiro se realizó con éxito");
-                        } else {
-                            System.out.print("Hubo un error al retirar el dinero");
-                        }
-
-                        break;
-                    case 9:// Consultar movimientos
-                        if (tokenUsuario == null) {
-                            System.out.println("Necesitas estar logeado");
-                            break;
-                        }
-
-                        System.out.print("Introduce el indice de la cuenta que quieres consultar (tienes " + cuentas.size() + " cuentas): ");
-                        int posCuenta = Integer.parseInt(input.readLine());
-                        Date fInicio,
-                         fFin;
-
-                        System.out.print("Introduce la fecha de inicio (dd/mm/yyyy): ");
-                        String fecha = input.readLine();
-                        fInicio = sdf.parse(fecha);
-
-                        System.out.print("Introduce la fecha de fin (dd/mm/yyyy): ");
-                        fecha = input.readLine();
-                        fFin = sdf.parse(fecha);
-
-                        List<Transaccion> operaciones = sTrans.consultar(tokenUsuario, cuentas.get(posCuenta).getId(), fInicio, fFin);
-
-                        if (operaciones.isEmpty()) {
-                            System.out.println("No se ha hecho ninguna operación entre esas fechas");
-                        } else {
-                            System.out.println("------------------");
-                            operaciones.forEach((transaccion) -> {
-                                System.out.println(transaccion.toString());
-                                System.out.println("------------------");
-                            });
-                        }
-
-                        break;
-
-                    default:
-                        System.out.println("SALIR");
-                        opcion = -1;
-                }
-                if (opcion != -1) {
-                    System.out.println(" (pulsa enter para volver)");
-                    input.readLine();//Pausa para enter
-                    borrarConsola();
-                }
-            } catch (Exception | Error ex) {
-                Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("!Hubo un error: " + ex.getClass().getName());
-            }
+        } catch (Exception | Error ex) {
+            Logger.getLogger(Cliente.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("!Hubo un error: " + ex.getClass().getName());
         }
 
         System.out.println("Finalazada operación");
 
-//        EuroUJACoinRate e;
     }
 
     private static List<Tarjeta> crearTarjetas() {

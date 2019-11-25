@@ -12,7 +12,7 @@ package es.ujaen.dae.ujabank.DTO;
 public class DTOCuenta {
 
     private int _id;
-    private float _saldo;
+    private double _saldo;
 
     public DTOCuenta() {
     }
@@ -25,11 +25,11 @@ public class DTOCuenta {
         this._id = _id;
     }
 
-    public float getSaldo() {
+    public double getSaldo() {
         return _saldo;
     }
 
-    public void setSaldo(float _saldo) {
+    public void setSaldo(double _saldo) {
         this._saldo = _saldo;
     }
 }

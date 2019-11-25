@@ -24,7 +24,7 @@ public class DTOTransaccion {
     private Date _fecha;
     private int _destino;
     private String _concepto;
-    private float _cantidad;
+    private double _cantidad;
 
     public DTOTransaccion() {
 
@@ -77,11 +77,11 @@ public class DTOTransaccion {
         this._concepto = _concepto;
     }
 
-    public float getCantidad() {
+    public double getCantidad() {
         return _cantidad;
     }
 
-    public void setCantidad(float _cantidad) {
+    public void setCantidad(double _cantidad) {
         this._cantidad = _cantidad;
     }
 
