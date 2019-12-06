@@ -14,9 +14,11 @@ import es.ujaen.dae.ujabank.entidades.Transferencia;
 import es.ujaen.dae.ujabank.entidades.Usuario;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,8 +109,9 @@ public class DAOCuenta extends DAOGenerico<Cuenta> {
         return (retirar) ? (retiro) : (null);
     }
 
+    @Async
     @Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
-    public List<Transaccion> consultarTransacciones(Cuenta cuenta, Date inicio, Date fin) {
+    public CompletableFuture<List<Transaccion>> consultarTransacciones(Cuenta cuenta, Date inicio, Date fin) {
 
         cuenta = this.buscar(cuenta.getID());
         List<Transaccion> transaccion = em.createQuery("SELECT t FROM Cuenta c JOIN c.historial t WHERE c.id = :id AND t.fecha BETWEEN :inicio and :fin", Transaccion.class)
@@ -116,6 +119,7 @@ public class DAOCuenta extends DAOGenerico<Cuenta> {
                 .setParameter("inicio", inicio)
                 .setParameter("fin", fin)
                 .getResultList();
-        return transaccion;
+
+        return CompletableFuture.completedFuture(transaccion);
     }
 }

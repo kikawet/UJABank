@@ -10,5 +10,5 @@ package es.ujaen.dae.ujabank.anotaciones;
  * @author flo00008
  */
 public @interface Logout {
-    
+
 }

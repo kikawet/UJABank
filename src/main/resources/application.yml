@@ -11,6 +11,7 @@ spring.datasource.password: ujabankpass
 spring.jpa.show-sql: false
 spring.jpa.hibernate.ddl-auto: none
 spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.DerbyTenSevenDialect
+spring.jpa.open-in-view: true #por defecto es true pero al lanzar da warning
 
 #Cache config
 spring.cache.ehcache.config: classpath:ehcache.xml

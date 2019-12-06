@@ -33,7 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -195,7 +197,8 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     }
 
     @Override
-    public List<DTOTransaccion> consultar(String id, int idCuenta, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
+    @Async
+    public CompletableFuture<List<DTOTransaccion>> consultar(String id, int idCuenta, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
 //        if (token == null) {
 //            throw new TokenIncorrecto();
 //        }
@@ -232,12 +235,17 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ErrorAutorizacion();
         }
 
-        List<Transaccion> transacciones = this.cuentasBanco.consultarTransacciones(cuenta, inicio, fin);
+        CompletableFuture<List<Transaccion>> listaTransacciones = this.cuentasBanco.consultarTransacciones(cuenta, inicio, fin);
+
         List<DTOTransaccion> dtoTransacciones = new ArrayList<>();
-        transacciones.forEach((transaccion) -> {
-            dtoTransacciones.add(Mapper.dtoTransaccionMapper(transaccion));
+
+        listaTransacciones.thenAccept((transacciones) -> {
+            transacciones.forEach((transaccion) -> {
+                dtoTransacciones.add(Mapper.dtoTransaccionMapper(transaccion));
+            });
         });
-        return dtoTransacciones;
+
+        return CompletableFuture.completedFuture(dtoTransacciones);
     }
 
     @Override
@@ -255,7 +263,6 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
 //        Usuario usuario = Mapper.usuarioMapper(u);
-
         if (!this.usuariosBanco.contiene(usuario)) {
             this.usuariosBanco.insertar(usuario);// al insertar si al añadir la cuenta da error lanza excepcion aqui
             Cuenta cuenta = cuentasBanco.crear(0, usuario);
@@ -265,7 +272,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         } else {
             throw new UsuarioIncorrecto();
         }
-        
+
         return usuario != null;
     }
 
@@ -345,7 +352,6 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 //        
 //        return this._tokensActivos.remove(token) != null;
 //    }
-
     @Override
     public boolean borrarUsuario(String id) {
         //borrar cuentas
@@ -358,10 +364,10 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 //        }
 //        
 //        Usuario usuario = this._tokensActivos.get(token);
-        
+
         usuariosBanco.borrar(id);
-        
+
         return usuariosBanco.buscar(id) != null;
-        
+
     }
 }

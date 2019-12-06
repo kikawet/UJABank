@@ -6,6 +6,7 @@
 package es.ujaen.dae.ujabank;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
 import org.springframework.boot.SpringApplication;
@@ -48,5 +49,10 @@ public class UJABank {
     @ExceptionHandler({ConstraintViolationException.class})
     public void handlerToken(HttpServletResponse response) throws IOException {
         response.sendError(HttpStatus.BAD_REQUEST.value());
+    }
+
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ExceptionHandler({InterruptedException.class, ExecutionException.class})
+    public void handlerConcurrencia() {
     }
 }

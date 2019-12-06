@@ -3,7 +3,7 @@ Práctica 2 acabada
 ## TODO
 - [x] Quitar cliente
 - [x] RESTusuario
-- [ ] RESTcuenta
+- [x] RESTcuenta
 - [ ] Autentificación basic
 - [ ] Usar API de conversión
 

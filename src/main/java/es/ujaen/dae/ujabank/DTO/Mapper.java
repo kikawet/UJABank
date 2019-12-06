@@ -31,7 +31,7 @@ public class Mapper {
         u.setTelefono(usuario.getTelefono());
         u.setfNacimiento(usuario.getfNacimiento());
         u.setContrasena(usuario.getContrasena());
-        
+
         return u;
     }
 

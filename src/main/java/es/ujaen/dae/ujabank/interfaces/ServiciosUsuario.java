@@ -20,11 +20,10 @@ public interface ServiciosUsuario {
     public boolean registrar(Usuario usuario);
 
     public boolean login(Usuario usuario);
-        
-    public boolean borrarUsuario(String dni);
-    
-//    public boolean logout(String dni);
 
+    public boolean borrarUsuario(String dni);
+
+//    public boolean logout(String dni);
     public boolean crearCuenta(String dni);
 
     public List<DTOCuenta> consultarCuentas(String dni);

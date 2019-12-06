@@ -51,12 +51,14 @@ import org.springframework.web.context.request.WebRequest;
  * @author flo00008
  */
 @RestController
-@RequestMapping("/usuario")
+@RequestMapping(RESTUsuario.URI_MAPPING)
 @Validated
 public class RESTUsuario {// implements ServiciosUsuario{
 
     @Autowired
     private Banco ujabank;
+
+    public static final String URI_MAPPING = "/usuario";
 
     @GetMapping("/test")
     public ResponseEntity comprobar() {
@@ -105,7 +107,7 @@ public class RESTUsuario {// implements ServiciosUsuario{
     @GetMapping(value = "/{id}/cuentas")
     public ResponseEntity consultarCuentas(@PathVariable("id") String dni, @ValidarToken @RequestParam String token) {
         List<?> cuentas = ujabank.consultarCuentas(dni);
-        
+
         return ResponseEntity.ok(cuentas);
     }
 
