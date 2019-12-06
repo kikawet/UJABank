@@ -1,8 +1,11 @@
 Práctica 2 acabada
 
 ## TODO
-- [x] mappear
-- [x] aislamiento
-- [x] cache
-- [x] copiar menu
-- [x] limpiar
+- [x] Quitar cliente
+- [x] RESTusuario
+- [ ] RESTcuenta
+- [ ] Autentificación basic
+- [ ] Usar API de conversión
+
+- [ ] Usar HTTPS
+- [ ] Portar el cliente a web

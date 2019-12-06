@@ -10,14 +10,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.ApplicationContext;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  *
  * @author lopez
  */
-@SpringBootApplication(scanBasePackages = {"es.ujaen.dae.ujabank.beans", "es.ujaen.dae.ujabank.DAO"})
+@SpringBootApplication(scanBasePackages = {"es.ujaen.dae.ujabank.beans", "es.ujaen.dae.ujabank.DAO","es.ujaen.dae.ujabank.restapi"})
 @EntityScan(basePackages = "es.ujaen.dae.ujabank.entidades")
 @EnableCaching
+//@EnableAsync
 public class UJABank {
 
     public static void main(String[] args) throws Exception {
