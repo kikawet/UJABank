@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package es.ujaen.dae.ujabank.validators;
+package es.ujaen.dae.ujabank.anotaciones;
 
 /**
  *
  * @author flo00008
  */
-public class TokenValidator {
+public @interface Logout {
     
 }

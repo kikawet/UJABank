@@ -8,10 +8,13 @@ package es.ujaen.dae.ujabank.restapi;
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.DTO.Mapper;
+import es.ujaen.dae.ujabank.anotaciones.Login;
+import es.ujaen.dae.ujabank.anotaciones.Logout;
 import es.ujaen.dae.ujabank.beans.Banco;
 import es.ujaen.dae.ujabank.entidades.Usuario;
 import es.ujaen.dae.ujabank.excepciones.formato.TokenIncorrecto;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
+import es.ujaen.dae.ujabank.validators.TokenManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,12 +22,14 @@ import java.util.TreeMap;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.validation.Valid;
 import javax.websocket.server.PathParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -36,6 +41,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import es.ujaen.dae.ujabank.anotaciones.ValidarToken;
+import javax.validation.ConstraintViolationException;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.WebRequest;
 
 /**
  *
@@ -43,17 +52,11 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/usuario")
+@Validated
 public class RESTUsuario {// implements ServiciosUsuario{
 
     @Autowired
     private Banco ujabank;
-
-    private final Map<UUID, Usuario> _tokensActivos;
-
-    public RESTUsuario() {
-//        this._tokensActivos = _tokensActivos;
-        this._tokensActivos = new TreeMap<>();
-    }
 
     @GetMapping("/test")
     public ResponseEntity comprobar() {
@@ -68,25 +71,15 @@ public class RESTUsuario {// implements ServiciosUsuario{
     }
 
     @PostMapping("/{id}/cc")
-    public ResponseEntity crearCuenta(@PathVariable("id") String dni, @RequestParam(defaultValue = "") String token) {
-        try {
-            ujabank.crearCuenta(dni);
-        } catch (IllegalArgumentException e) {
-            throw new TokenIncorrecto();
-        }
+    public ResponseEntity crearCuenta(@PathVariable("id") String dni, @ValidarToken @RequestParam String token) {
+        ujabank.crearCuenta(dni);
+
         return ResponseEntity.status(HttpStatus.CREATED).build();
-    }
-
-    //@Async//Para que funcione hace falta que este método esté en un servicio pero lo dejo igual
-    private void limpiarToken(Usuario usuario, UUID token) {
-
-        this._tokensActivos.entrySet().removeIf((entry) -> {
-            return usuario.equals(entry.getValue()) && !token.equals(entry.getKey());
-        });
     }
 
 //    @Overrider
     @GetMapping//(consumes = MediaType.APPLICATION_JSON_VALUE, poduces = MediaType.TEXT_PLAIN_VALUE)
+    @Login
     public ResponseEntity login(@RequestBody(required = true) DTOUsuario usuarioDTO) {
         Usuario usuario = Mapper.usuarioMapper(usuarioDTO);
         boolean logeable = ujabank.login(usuario);
@@ -95,34 +88,24 @@ public class RESTUsuario {// implements ServiciosUsuario{
 
         if (logeable) {
             token = UUID.randomUUID();
-            this._tokensActivos.put(token, usuario);
-            limpiarToken(usuario, token);
         }
 
         return ResponseEntity.ok(token);
     }
 
     @GetMapping("/{id}/logout")//como alternativa poner un put 
-    public ResponseEntity logout(@RequestParam(defaultValue = "") String token) {
-        try {
-            //ujabank.logout(UUID.fromString(token));
-            this._tokensActivos.remove(UUID.fromString(token));
-        } catch (IllegalArgumentException e) {
-            throw new TokenIncorrecto();
-        }
+    @Logout
+    public ResponseEntity logout(@ValidarToken @RequestParam String token) {
+        //El aop ya lo elimina y solo se entra si el token existe
 
         return ResponseEntity.ok().build();
     }
 
 //    @Override
     @GetMapping(value = "/{id}/cuentas")
-    public ResponseEntity consultarCuentas(@PathVariable("id") String dni, @RequestParam(defaultValue = "") String token) {
-        List<?> cuentas;
-        try {
-            cuentas = ujabank.consultarCuentas(dni);
-        } catch (IllegalArgumentException e) {
-            throw new TokenIncorrecto();
-        }
+    public ResponseEntity consultarCuentas(@PathVariable("id") String dni, @ValidarToken @RequestParam String token) {
+        List<?> cuentas = ujabank.consultarCuentas(dni);
+        
         return ResponseEntity.ok(cuentas);
     }
 
@@ -136,11 +119,4 @@ public class RESTUsuario {// implements ServiciosUsuario{
 
         return ResponseEntity.ok().build();
     }
-
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    @ExceptionHandler({TokenIncorrecto.class})
-    public void handlerToken() {
-
-    }
-
 }

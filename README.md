@@ -9,3 +9,5 @@ Práctica 2 acabada
 
 - [ ] Usar HTTPS
 - [ ] Portar el cliente a web
+
+- [x] Gestor de Tokens usando AOP y validaciones
