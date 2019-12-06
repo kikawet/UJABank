@@ -5,7 +5,6 @@
  */
 package es.ujaen.dae.ujabank.anotaciones;
 
-import antlr.Token;
 import es.ujaen.dae.ujabank.validators.TokenManager;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

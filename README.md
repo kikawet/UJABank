@@ -5,7 +5,7 @@ Práctica 2 acabada
 - [x] RESTusuario
 - [x] RESTcuenta
 - [ ] Autentificación basic
-- [ ] Usar API de conversión
+- [x] Usar API de conversión
 
 - [ ] Usar HTTPS
 - [ ] Portar el cliente a web

@@ -5,12 +5,10 @@
  */
 package es.ujaen.dae.ujabank.beans;
 
-import es.dae.ujaen.euroujacoinrate.EuroUJACoinRate;
 import es.ujaen.dae.ujabank.DAO.DAOCuenta;
 import es.ujaen.dae.ujabank.DAO.DAOUsuario;
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
-import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.DTO.Mapper;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
 import es.ujaen.dae.ujabank.entidades.Cuenta;
@@ -22,7 +20,6 @@ import es.ujaen.dae.ujabank.excepciones.formato.ConceptoIncorrecto;
 import es.ujaen.dae.ujabank.excepciones.formato.CuentaIncorrecta;
 import es.ujaen.dae.ujabank.excepciones.formato.FechaIncorrecta;
 import es.ujaen.dae.ujabank.excepciones.formato.TarjetaIncorrecta;
-import es.ujaen.dae.ujabank.excepciones.formato.TokenIncorrecto;
 import es.ujaen.dae.ujabank.excepciones.formato.UsuarioIncorrecto;
 import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
@@ -30,10 +27,8 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
@@ -51,7 +46,9 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Autowired
     private DAOCuenta cuentasBanco;
 
-    private static final EuroUJACoinRate euro_UJACoin = new EuroUJACoinRate();
+//    private static final EuroUJACoinRate euro_UJACoin = new EuroUJACoinRate();
+    @Autowired
+    private ConversorUJACoin euro_UJACoin;
 
     public Banco() {
 //        this._tokensActivos = new TreeMap<>();
@@ -93,7 +90,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         origen.retirar(cantidad);
 
-        cantidad *= euro_UJACoin.euroToUJACoinToday();
+        cantidad *= euro_UJACoin.euroToUC();
 
         return this.cuentasBanco.ingresar(origen, cuenta, cantidad) != null;
     }
@@ -189,7 +186,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         boolean retiro = this.cuentasBanco.retirar(cuenta, destino, cantidad) != null;
 
-        cantidad *= euro_UJACoin.ujaCoinToEuroToday();
+        cantidad *= euro_UJACoin.UCToEuro();
         destino.ingresar(cantidad);
 
         //si no se ha ingresado deshacer
@@ -239,11 +236,15 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         List<DTOTransaccion> dtoTransacciones = new ArrayList<>();
 
-        listaTransacciones.thenAccept((transacciones) -> {
-            transacciones.forEach((transaccion) -> {
+        try {
+            List<Transaccion> lt = listaTransacciones.get();
+
+            lt.forEach((transaccion) -> {
                 dtoTransacciones.add(Mapper.dtoTransaccionMapper(transaccion));
             });
-        });
+
+        } catch (InterruptedException | ExecutionException ex) {
+        }
 
         return CompletableFuture.completedFuture(dtoTransacciones);
     }
@@ -263,17 +264,19 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
 //        Usuario usuario = Mapper.usuarioMapper(u);
+        boolean insertado;
+        
         if (!this.usuariosBanco.contiene(usuario)) {
             this.usuariosBanco.insertar(usuario);// al insertar si al añadir la cuenta da error lanza excepcion aqui
             Cuenta cuenta = cuentasBanco.crear(0, usuario);
 
-            usuario.addCuenta(cuenta);
+            insertado = usuario.addCuenta(cuenta);
             this.usuariosBanco.actualizar(usuario);
         } else {
             throw new UsuarioIncorrecto();
         }
 
-        return usuario != null;
+        return insertado;
     }
 
     @Override

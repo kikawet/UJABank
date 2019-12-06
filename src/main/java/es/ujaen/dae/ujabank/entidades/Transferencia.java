@@ -14,7 +14,6 @@ import javax.persistence.Entity;
  * @author axpos
  */
 @Entity
-
 public class Transferencia extends Transaccion implements Serializable {
 
     private int idOrigen;

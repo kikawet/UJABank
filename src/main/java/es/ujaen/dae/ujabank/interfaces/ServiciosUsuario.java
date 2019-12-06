@@ -6,10 +6,8 @@
 package es.ujaen.dae.ujabank.interfaces;
 
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
-import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.entidades.Usuario;
 import java.util.List;
-import java.util.UUID;
 
 /**
  *
@@ -23,7 +21,6 @@ public interface ServiciosUsuario {
 
     public boolean borrarUsuario(String dni);
 
-//    public boolean logout(String dni);
     public boolean crearCuenta(String dni);
 
     public List<DTOCuenta> consultarCuentas(String dni);

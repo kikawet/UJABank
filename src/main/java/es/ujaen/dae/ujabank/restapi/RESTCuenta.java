@@ -9,6 +9,9 @@ import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
 import es.ujaen.dae.ujabank.anotaciones.ValidarToken;
 import es.ujaen.dae.ujabank.beans.Banco;
+import es.ujaen.dae.ujabank.excepciones.formato.FechaIncorrecta;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -76,23 +79,40 @@ public class RESTCuenta {
     @GetMapping("/{idCuenta}")
     public ResponseEntity consultar(@ValidarToken @RequestParam String token,
             @PathVariable String id, @PathVariable @Min(0) int idCuenta,
-            @RequestParam(value = "finicio", required = false) Date inicio,
-            @RequestParam(value = "ffin", required = false) Date fin)
+            @RequestParam(value = "finicio", required = false) String sinicio,
+            @RequestParam(value = "ffin", required = false) String sfin)
             throws InterruptedException, ExecutionException {
 
-        if (inicio == null) {
-            Calendar finicio = Calendar.getInstance();
-            finicio.set(Calendar.DAY_OF_MONTH, 1);
-            inicio = finicio.getTime();
-        }
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");//No se si es por el locale pero lo lee mal
 
-        if (fin == null) {
-            fin = new Date();
+        Date inicio, fin;
+
+        try {
+            if (sinicio == null) {
+                Calendar finicio = Calendar.getInstance();
+                finicio.set(Calendar.DAY_OF_MONTH, 1);
+                inicio = finicio.getTime();
+            } else {
+                inicio = sdf.parse(sinicio);
+            }
+
+            if (sfin == null) {
+                Calendar ffin = Calendar.getInstance();
+                ffin.add(Calendar.DAY_OF_MONTH, 1);//Para incluir hoy también
+                fin = ffin.getTime();
+            } else {
+                fin = sdf.parse(sfin);
+            }
+
+        } catch (ParseException ex) {
+            throw new FechaIncorrecta();
         }
 
         CompletableFuture<List<DTOTransaccion>> transacciones;
         transacciones = ujabank.consultar(id, idCuenta, inicio, fin);
-        return ResponseEntity.ok(transacciones.get());//Encontré una manera de hacerlo pero se usaba webflux
+
+        List<DTOTransaccion> finala = transacciones.get();
+        return ResponseEntity.ok(finala);//Encontré una manera de hacerlo pero se usaba webflux
     }
 
 }

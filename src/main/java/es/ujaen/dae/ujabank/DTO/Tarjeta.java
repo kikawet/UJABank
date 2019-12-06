@@ -64,10 +64,7 @@ public class Tarjeta {
         if (!Objects.equals(this._cvv, other._cvv)) {
             return false;
         }
-        if (!Objects.equals(this._fCaducidad, other._fCaducidad)) {
-            return false;
-        }
-        return true;
+        return Objects.equals(this._fCaducidad, other._fCaducidad);
     }
 
     public String getTitular() {
