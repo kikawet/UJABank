@@ -18,3 +18,10 @@ spring.cache.ehcache.config: classpath:ehcache.xml
 
 #Path base de la REST API 
 server.servlet.context-path: /ujabank
+
+#HTTPS config
+server.port: 8080
+server.ssl.key-store: classpath:ujabankcert.p12
+server.ssl.key-store-password: 123456
+server.ssl.keyStoreType: PKCS12
+server.ssl.keyAlias: tomcat

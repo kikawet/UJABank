@@ -7,7 +7,7 @@ Práctica 2 acabada
 - [x] Autentificación basic
 - [x] Usar API de conversión
 
-- [ ] Usar HTTPS
+- [x] Usar HTTPS
 - [ ] Crear cliente web
 
 - [x] ~~Gestor de Tokens usando AOP y validaciones~~
