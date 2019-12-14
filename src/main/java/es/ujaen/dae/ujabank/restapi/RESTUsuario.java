@@ -37,10 +37,10 @@ import org.springframework.web.bind.annotation.RestController;
 @Validated
 public class RESTUsuario {// implements ServiciosUsuario{
 
+    public static final String URI_MAPPING = "/usuario";
+    
     @Autowired
     private Banco ujabank;
-
-    public static final String URI_MAPPING = "/usuario";
 
     @GetMapping("/test")
     public ResponseEntity comprobar() {
@@ -57,7 +57,6 @@ public class RESTUsuario {// implements ServiciosUsuario{
     @PostMapping("/{id}/cc")
     public ResponseEntity crearCuenta(@PathVariable("id") String dni) {
         ujabank.crearCuenta(dni);
-
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 

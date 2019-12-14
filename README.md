@@ -4,10 +4,10 @@ Práctica 2 acabada
 - [x] Quitar cliente
 - [x] RESTusuario
 - [x] RESTcuenta
-- [ ] Autentificación basic
+- [x] Autentificación basic
 - [x] Usar API de conversión
 
 - [ ] Usar HTTPS
-- [ ] Portar el cliente a web
+- [ ] Crear cliente web
 
-- [x] Gestor de Tokens usando AOP y validaciones
+- [x] ~~Gestor de Tokens usando AOP y validaciones~~

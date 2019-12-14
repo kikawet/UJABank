@@ -11,6 +11,7 @@ import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.DTO.Mapper;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
+import es.ujaen.dae.ujabank.config.SeguridadUJABank;
 import es.ujaen.dae.ujabank.entidades.Cuenta;
 import es.ujaen.dae.ujabank.entidades.Transaccion;
 import es.ujaen.dae.ujabank.entidades.Usuario;
@@ -49,6 +50,9 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 //    private static final EuroUJACoinRate euro_UJACoin = new EuroUJACoinRate();
     @Autowired
     private ConversorUJACoin euro_UJACoin;
+    
+    @Autowired
+    private SeguridadUJABank seguridad;
 
     public Banco() {
 //        this._tokensActivos = new TreeMap<>();
@@ -63,7 +67,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         Usuario usuario = this.usuariosBanco.buscar(id);//this._tokensActivos.get(token);
 
         if (usuario == null) {
-            throw new UsuarioIncorrecto();
+            throw new ErrorAutorizacion();
         }
 
         if (origen == null) {
@@ -131,7 +135,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
         if (!usuario.equals(cOrigen.getPropietario())) {
-            throw new ErrorAutorizacion();
+            throw new CuentaNoPerteneceUsuario();
         }
 
         if (cantidad > cOrigen.getSaldo()) {
@@ -177,7 +181,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
         if (!usuario.equals(cuenta.getPropietario())) {
-            throw new ErrorAutorizacion();
+            throw new CuentaNoPerteneceUsuario();
         }
 
         if (cantidad > cuenta.getSaldo()) {
@@ -199,6 +203,10 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 //        if (token == null) {
 //            throw new TokenIncorrecto();
 //        }
+
+        if(id == null){
+            throw new ErrorAutorizacion();
+        }
 
         if (idCuenta < 0) {
             throw new CuentaIncorrecta();
@@ -229,7 +237,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
         if (!usuario.equals(cuenta.getPropietario())) {
-            throw new ErrorAutorizacion();
+            throw new CuentaNoPerteneceUsuario();
         }
 
         CompletableFuture<List<Transaccion>> listaTransacciones = this.cuentasBanco.consultarTransacciones(cuenta, inicio, fin);
@@ -263,10 +271,10 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new ContrasenaIncorrecta();
         }
 
-//        Usuario usuario = Mapper.usuarioMapper(u);
         boolean insertado;
         
         if (!this.usuariosBanco.contiene(usuario)) {
+            usuario.setContrasena(seguridad.encode(usuario.getContrasena()));
             this.usuariosBanco.insertar(usuario);// al insertar si al añadir la cuenta da error lanza excepcion aqui
             Cuenta cuenta = cuentasBanco.crear(0, usuario);
 
@@ -298,7 +306,8 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         if (usuario == null) {
             throw new ErrorAutorizacion();
         }
-        if (!usuario.getContrasena().equals(usuarioLogin.getContrasena())) {
+        
+        if (!this.seguridad.matches(usuarioLogin.getContrasena(), usuario.getContrasena())) {
             throw new ContrasenaIncorrecta();
         }
 
@@ -307,11 +316,8 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
     @Override
     public boolean crearCuenta(String id) throws IllegalAccessError {
-//        if (token == null) {
-//            throw new TokenIncorrecto();
-//        }
 
-        Usuario usuario = this.usuariosBanco.buscar(id);//this._tokensActivos.get(token);
+        Usuario usuario = this.usuariosBanco.buscar(id);
 
         if (usuario == null) {
             throw new ErrorAutorizacion();
@@ -324,14 +330,6 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
     @Override
     public List<DTOCuenta> consultarCuentas(String id) throws IllegalAccessError {
-//        if (token == null) {
-//            throw new TokenIncorrecto();
-//        }
-//
-//        if (!this._tokensActivos.containsKey(token)) {
-//            throw new ErrorAutorizacion();
-//        }
-
         ArrayList<DTOCuenta> cuentasDTO = new ArrayList<>();
 
         List<Cuenta> cuentas = this.usuariosBanco.getCuentas(id);

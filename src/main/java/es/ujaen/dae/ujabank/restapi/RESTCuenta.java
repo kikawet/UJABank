@@ -34,10 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
  * @author flo00008
  */
 @RestController
-@RequestMapping(RESTUsuario.URI_MAPPING + "/{id}/cuenta")
+@RequestMapping(RESTCuenta.URI_MAPPING)
 @Validated
 public class RESTCuenta {
 
+    public static final String URI_MAPPING = RESTUsuario.URI_MAPPING + "/{id}/cuenta";
+    
     @Autowired
     private Banco ujabank;
 

@@ -28,7 +28,14 @@ import org.springframework.web.client.RestTemplate;
  *
  * @author lopez
  */
-@SpringBootApplication(scanBasePackages = {"es.ujaen.dae.ujabank.beans", "es.ujaen.dae.ujabank.DAO", "es.ujaen.dae.ujabank.restapi", "es.ujaen.dae.ujabank.validators"})
+@SpringBootApplication(scanBasePackages = {
+    "es.ujaen.dae.ujabank.beans",
+    "es.ujaen.dae.ujabank.DAO",
+    "es.ujaen.dae.ujabank.restapi", 
+//    "es.ujaen.dae.ujabank.validators",//Para validar con token no se usa con spring security
+    "es.ujaen.dae.ujabank.config",
+    "es.ujaen.dae.ujabank.servicios"
+})
 @EntityScan(basePackages = "es.ujaen.dae.ujabank.entidades")
 @EnableCaching
 @EnableAsync(proxyTargetClass = true)//marcar esto a true es importante
