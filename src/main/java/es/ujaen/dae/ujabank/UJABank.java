@@ -51,13 +51,6 @@ public class UJABank {
         SpringApplication servidor = new SpringApplication(UJABank.class);
         ApplicationContext contexto = servidor.run(args);
         System.out.println("Servidor iniciado");
-
-//        String [] beans;
-//        beans = contexto.getBeanDefinitionNames();
-//        
-//        for (String bean : beans) {
-//            System.out.println(bean);
-//        }
     }
 
     //Excepción que se lanza cuando el token no es válido

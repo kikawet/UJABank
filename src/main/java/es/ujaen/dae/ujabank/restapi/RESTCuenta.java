@@ -7,7 +7,6 @@ package es.ujaen.dae.ujabank.restapi;
 
 import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
-import es.ujaen.dae.ujabank.anotaciones.ValidarToken;
 import es.ujaen.dae.ujabank.beans.Banco;
 import es.ujaen.dae.ujabank.excepciones.formato.FechaIncorrecta;
 import java.text.ParseException;

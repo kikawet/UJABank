@@ -68,5 +68,4 @@ public class TokenManager implements ConstraintValidator<ValidarToken, String> {
             String dni = tokensActivos.remove(token2);
         }
     }
-
 }

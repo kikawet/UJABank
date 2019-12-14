@@ -5,7 +5,6 @@
  */
 package es.ujaen.dae.ujabank.config;
 
-import es.ujaen.dae.ujabank.restapi.RESTCuenta;
 import es.ujaen.dae.ujabank.restapi.RESTUsuario;
 import es.ujaen.dae.ujabank.servicios.ServicioDatosUsuario;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 
 /**
  *
@@ -31,6 +29,7 @@ public class SeguridadUJABank extends WebSecurityConfigurerAdapter{
     
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception{
+        //Ademas de todos los usuarios en la base de datos creamos dos administradores
         auth.inMemoryAuthentication()
                 .withUser("flo").roles("ADMIN","DEFAULT").password("{noop}dae")//{noop} = Contraseña sin encriptar
                 .and()
@@ -60,6 +59,5 @@ public class SeguridadUJABank extends WebSecurityConfigurerAdapter{
     
     public boolean matches(String contrasenaRaw, String contrasenaEncriptada){
         return encoder.matches(contrasenaRaw, contrasenaEncriptada);
-    }
-    
+    }    
 }

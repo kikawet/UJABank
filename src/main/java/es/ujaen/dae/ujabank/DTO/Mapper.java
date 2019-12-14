@@ -86,7 +86,6 @@ public class Mapper {
 
         }
         return dtoTransaccion;
-
     }
 
 }

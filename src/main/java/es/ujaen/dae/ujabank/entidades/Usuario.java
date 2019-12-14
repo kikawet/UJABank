@@ -133,8 +133,4 @@ public class Usuario implements Serializable {
     public boolean removeCuenta(Cuenta c) {
         return this.cuentas.remove(c);
     }
-
-//    public boolean containsCuenta(Cuenta c) {
-//        return this.cuentas.contains(c);
-//    }
 }

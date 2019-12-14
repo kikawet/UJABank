@@ -47,7 +47,6 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     @Autowired
     private DAOCuenta cuentasBanco;
 
-//    private static final EuroUJACoinRate euro_UJACoin = new EuroUJACoinRate();
     @Autowired
     private ConversorUJACoin euro_UJACoin;
     
@@ -55,16 +54,12 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     private SeguridadUJABank seguridad;
 
     public Banco() {
-//        this._tokensActivos = new TreeMap<>();
     }
 
     @Override
     public boolean ingresar(String id, Tarjeta origen, int idDestino, float cantidad) throws IllegalAccessError, InvalidParameterException {
-//        if (token == null) {
-//            throw new TokenIncorrecto();
-//        }
 
-        Usuario usuario = this.usuariosBanco.buscar(id);//this._tokensActivos.get(token);
+        Usuario usuario = this.usuariosBanco.buscar(id);
 
         if (usuario == null) {
             throw new ErrorAutorizacion();
@@ -101,12 +96,9 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
     @Override
     public boolean transferir(String id, int idOrigen, int idDestino, float cantidad, String concepto) throws InvalidParameterException, IllegalAccessError {
-//        if (token == null) {
-//            throw new TokenIncorrecto();
-//        }
 
-        Usuario usuario = this.usuariosBanco.buscar(id);//_tokensActivos.get(token);
-
+        Usuario usuario = this.usuariosBanco.buscar(id);
+        
         if (usuario == null) {
             throw new ErrorAutorizacion();
         }
@@ -146,17 +138,13 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CuentaIncorrecta();
         }
 
-//        cantidad = EuroUJACoinRate... // no es necesario entre cuentas
         return this.cuentasBanco.transferir(cOrigen, cDestino, cantidad, concepto) != null;
     }
 
     @Override
     public boolean retirar(String id, int idOrigen, Tarjeta destino, float cantidad) throws InvalidParameterException, IllegalAccessError {
-//        if (token == null) {
-//            throw new TokenIncorrecto();
-//        }
 
-        Usuario usuario = this.usuariosBanco.buscar(id);//_tokensActivos.get(token);
+        Usuario usuario = this.usuariosBanco.buscar(id);
 
         if (usuario == null) {
             throw new ErrorAutorizacion();
@@ -193,16 +181,12 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         cantidad *= euro_UJACoin.UCToEuro();
         destino.ingresar(cantidad);
 
-        //si no se ha ingresado deshacer
         return retiro;
     }
 
     @Override
     @Async
     public CompletableFuture<List<DTOTransaccion>> consultar(String id, int idCuenta, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
-//        if (token == null) {
-//            throw new TokenIncorrecto();
-//        }
 
         if(id == null){
             throw new ErrorAutorizacion();
@@ -224,7 +208,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new FechaFinAnteriorAInicio();
         }
 
-        Usuario usuario = this.usuariosBanco.buscar(id);//_tokensActivos.get(token);
+        Usuario usuario = this.usuariosBanco.buscar(id);
 
         if (usuario == null) {
             throw new ErrorAutorizacion();
@@ -341,33 +325,9 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         return cuentasDTO;
     }
 
-//    @Override
-//    public boolean logout(UUID token) {     
-//        if (token == null) {
-//            throw new TokenIncorrecto();
-//        }
-//
-//        if (!this._tokensActivos.containsKey(token)) {
-//            throw new ErrorAutorizacion();
-//        }
-//        
-//        return this._tokensActivos.remove(token) != null;
-//    }
     @Override
     public boolean borrarUsuario(String id) {
-        //borrar cuentas
-//        if (token == null) {
-//            throw new TokenIncorrecto();
-//        }
-//
-//        if (!this._tokensActivos.containsKey(token)) {
-//            throw new ErrorAutorizacion();
-//        }
-//        
-//        Usuario usuario = this._tokensActivos.get(token);
-
         usuariosBanco.borrar(id);
-
         return usuariosBanco.buscar(id) != null;
 
     }

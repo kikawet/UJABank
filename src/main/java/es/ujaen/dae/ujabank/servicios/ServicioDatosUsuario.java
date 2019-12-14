@@ -34,7 +34,6 @@ public class ServicioDatosUsuario implements UserDetailsService{
         }
         
         return User.withUsername(dni).password(usuario.getContrasena()).roles("DEFAULT").build();
-    }
-    
+    }    
     
 }
