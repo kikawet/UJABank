@@ -47,8 +47,8 @@ public class RESTCuenta {
     }
 
     @PutMapping(value = "/{origen}/ingresar")
-    public ResponseEntity ingresar(@ValidarToken @RequestParam String token,
-            @PathVariable String id, @RequestBody Tarjeta origen,
+    public ResponseEntity ingresar(@PathVariable String id,
+            @RequestBody Tarjeta origen,
             @PathVariable("origen") int destino,
             @RequestParam @Min(0) float cantidad) {
 
@@ -57,8 +57,8 @@ public class RESTCuenta {
     }
 
     @PutMapping("/{origen}/transferir")
-    public ResponseEntity transferir(@ValidarToken @RequestParam String token,
-            @PathVariable String id, @PathVariable @Min(0) int origen,
+    public ResponseEntity transferir(@PathVariable String id,
+            @PathVariable @Min(0) int origen,
             @RequestParam @Min(0) int destino,
             @RequestParam @Min(0) float cantidad,
             @RequestParam(required = false, defaultValue = "") String concepto) {
@@ -68,8 +68,8 @@ public class RESTCuenta {
     }
 
     @PutMapping("/{origen}/retirar")
-    public ResponseEntity retirar(@ValidarToken @RequestParam String token,
-            @PathVariable String id, @PathVariable @Min(0) int origen,
+    public ResponseEntity retirar(@PathVariable String id,
+            @PathVariable @Min(0) int origen,
             @RequestBody Tarjeta destino, @RequestParam float cantidad) {
 
         ujabank.retirar(id, origen, destino, cantidad);
@@ -77,8 +77,8 @@ public class RESTCuenta {
     }
 
     @GetMapping("/{idCuenta}")
-    public ResponseEntity consultar(@ValidarToken @RequestParam String token,
-            @PathVariable String id, @PathVariable @Min(0) int idCuenta,
+    public ResponseEntity consultar(@PathVariable String id,
+            @PathVariable @Min(0) int idCuenta,
             @RequestParam(value = "finicio", required = false) String sinicio,
             @RequestParam(value = "ffin", required = false) String sfin)
             throws InterruptedException, ExecutionException {

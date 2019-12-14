@@ -55,14 +55,14 @@ public class RESTUsuario {// implements ServiciosUsuario{
     }
 
     @PostMapping("/{id}/cc")
-    public ResponseEntity crearCuenta(@PathVariable("id") String dni, @ValidarToken @RequestParam String token) {
+    public ResponseEntity crearCuenta(@PathVariable("id") String dni) {
         ujabank.crearCuenta(dni);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-//    @Overrider
-    @GetMapping//(consumes = MediaType.APPLICATION_JSON_VALUE, poduces = MediaType.TEXT_PLAIN_VALUE)
+    /*
+    @GetMapping
     @Login
     public ResponseEntity login(@RequestBody(required = true) DTOUsuario usuarioDTO) {
         Usuario usuario = Mapper.usuarioMapper(usuarioDTO);
@@ -84,10 +84,11 @@ public class RESTUsuario {// implements ServiciosUsuario{
 
         return ResponseEntity.ok().build();
     }
+    */
 
 //    @Override
     @GetMapping(value = "/{id}/cuentas")
-    public ResponseEntity consultarCuentas(@PathVariable("id") String dni, @ValidarToken @RequestParam String token) {
+    public ResponseEntity consultarCuentas(@PathVariable("id") String dni) {
         List<?> cuentas = ujabank.consultarCuentas(dni);
 
         return ResponseEntity.ok(cuentas);
