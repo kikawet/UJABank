@@ -20,11 +20,13 @@ import javax.validation.constraints.Min;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,11 +44,13 @@ public class RESTCuenta {
     @Autowired
     private Banco ujabank;
 
+    @CrossOrigin
     @GetMapping("/test")
     public ResponseEntity comprobar() {
         return ResponseEntity.ok("API funciona correctamente (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧");
     }
 
+    @CrossOrigin(methods = RequestMethod.PUT)
     @PutMapping(value = "/{origen}/ingresar")
     public ResponseEntity ingresar(@PathVariable String id,
             @RequestBody Tarjeta origen,
@@ -57,6 +61,7 @@ public class RESTCuenta {
         return ResponseEntity.ok().build();
     }
 
+    @CrossOrigin(methods = RequestMethod.PUT)
     @PutMapping("/{origen}/transferir")
     public ResponseEntity transferir(@PathVariable String id,
             @PathVariable @Min(0) int origen,
@@ -68,6 +73,7 @@ public class RESTCuenta {
         return ResponseEntity.ok().build();
     }
 
+    @CrossOrigin(methods = RequestMethod.PUT)
     @PutMapping("/{origen}/retirar")
     public ResponseEntity retirar(@PathVariable String id,
             @PathVariable @Min(0) int origen,
@@ -77,6 +83,7 @@ public class RESTCuenta {
         return ResponseEntity.ok().build();
     }
 
+    @CrossOrigin
     @GetMapping("/{idCuenta}")
     public ResponseEntity consultar(@PathVariable String id,
             @PathVariable @Min(0) int idCuenta,

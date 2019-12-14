@@ -10,4 +10,5 @@ Práctica 2 acabada
 - [x] Usar HTTPS
 - [ ] Crear cliente web
 
+- [x] Soporta CORS
 - [x] ~~Gestor de Tokens usando AOP y validaciones~~

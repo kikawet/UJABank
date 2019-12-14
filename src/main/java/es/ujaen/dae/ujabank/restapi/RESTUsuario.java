@@ -14,12 +14,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -36,24 +38,27 @@ public class RESTUsuario {// implements ServiciosUsuario{
     @Autowired
     private Banco ujabank;
 
+    @CrossOrigin
     @GetMapping("/test")
     public ResponseEntity comprobar() {
         return ResponseEntity.ok("API funciona correctamente (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧");
     }
 
-//    @Override
+    @CrossOrigin(methods = RequestMethod.POST)
     @PostMapping
     public ResponseEntity registrar(@RequestBody(required = true) DTOUsuario usuario) {
         ujabank.registrar(Mapper.usuarioMapper(usuario));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @CrossOrigin(methods = RequestMethod.POST)
     @PostMapping("/{id}/cc")
     public ResponseEntity crearCuenta(@PathVariable("id") String dni) {
         ujabank.crearCuenta(dni);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @CrossOrigin
     @GetMapping(value = "/{id}/cuentas")
     public ResponseEntity consultarCuentas(@PathVariable("id") String dni) {
         List<?> cuentas = ujabank.consultarCuentas(dni);
@@ -61,6 +66,7 @@ public class RESTUsuario {// implements ServiciosUsuario{
         return ResponseEntity.ok(cuentas);
     }
 
+    @CrossOrigin(methods = RequestMethod.DELETE)
     @DeleteMapping("/{id}")
     public ResponseEntity borrar(@PathVariable("id") String dni) {
         try {
