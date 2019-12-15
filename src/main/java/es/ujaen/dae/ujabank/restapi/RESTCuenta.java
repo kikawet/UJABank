@@ -44,13 +44,13 @@ public class RESTCuenta {
     @Autowired
     private Banco ujabank;
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*",methods = RequestMethod.GET, maxAge = 10000)
     @GetMapping("/test")
     public ResponseEntity comprobar() {
         return ResponseEntity.ok("API funciona correctamente (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧");
     }
 
-    @CrossOrigin(methods = RequestMethod.PUT)
+    @CrossOrigin(origins = "*", maxAge = 10000, methods = RequestMethod.PUT)
     @PutMapping(value = "/{origen}/ingresar")
     public ResponseEntity ingresar(@PathVariable String id,
             @RequestBody Tarjeta origen,
@@ -61,7 +61,7 @@ public class RESTCuenta {
         return ResponseEntity.ok().build();
     }
 
-    @CrossOrigin(methods = RequestMethod.PUT)
+    @CrossOrigin(origins = "*", maxAge = 10000, methods = RequestMethod.PUT)
     @PutMapping("/{origen}/transferir")
     public ResponseEntity transferir(@PathVariable String id,
             @PathVariable @Min(0) int origen,
@@ -73,7 +73,7 @@ public class RESTCuenta {
         return ResponseEntity.ok().build();
     }
 
-    @CrossOrigin(methods = RequestMethod.PUT)
+    @CrossOrigin(origins = "*", maxAge = 10000, methods = RequestMethod.PUT)
     @PutMapping("/{origen}/retirar")
     public ResponseEntity retirar(@PathVariable String id,
             @PathVariable @Min(0) int origen,
@@ -83,7 +83,7 @@ public class RESTCuenta {
         return ResponseEntity.ok().build();
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*",methods = RequestMethod.GET, maxAge = 10000)
     @GetMapping("/{idCuenta}")
     public ResponseEntity consultar(@PathVariable String id,
             @PathVariable @Min(0) int idCuenta,

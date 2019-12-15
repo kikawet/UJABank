@@ -38,27 +38,27 @@ public class RESTUsuario {// implements ServiciosUsuario{
     @Autowired
     private Banco ujabank;
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*",methods = RequestMethod.GET, maxAge = 10000)
     @GetMapping("/test")
     public ResponseEntity comprobar() {
         return ResponseEntity.ok("API funciona correctamente (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧");
     }
 
-    @CrossOrigin(methods = RequestMethod.POST)
+    @CrossOrigin(origins = "*", maxAge = 10000, methods = RequestMethod.POST)
     @PostMapping
     public ResponseEntity registrar(@RequestBody(required = true) DTOUsuario usuario) {
         ujabank.registrar(Mapper.usuarioMapper(usuario));
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @CrossOrigin(methods = RequestMethod.POST)
+    @CrossOrigin(origins = "*", maxAge = 10000, methods = RequestMethod.POST)
     @PostMapping("/{id}/cc")
     public ResponseEntity crearCuenta(@PathVariable("id") String dni) {
         ujabank.crearCuenta(dni);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @CrossOrigin
+    @CrossOrigin(origins = "*",methods = RequestMethod.GET, maxAge = 10000)
     @GetMapping(value = "/{id}/cuentas")
     public ResponseEntity consultarCuentas(@PathVariable("id") String dni) {
         List<?> cuentas = ujabank.consultarCuentas(dni);
@@ -66,7 +66,7 @@ public class RESTUsuario {// implements ServiciosUsuario{
         return ResponseEntity.ok(cuentas);
     }
 
-    @CrossOrigin(methods = RequestMethod.DELETE)
+    @CrossOrigin(origins = "*", maxAge = 10000, methods = RequestMethod.DELETE)
     @DeleteMapping("/{id}")
     public ResponseEntity borrar(@PathVariable("id") String dni) {
         try {
