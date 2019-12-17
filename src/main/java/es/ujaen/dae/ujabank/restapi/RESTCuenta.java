@@ -51,7 +51,7 @@ public class RESTCuenta {
     }
 
     @CrossOrigin(origins = "*", maxAge = 10000, methods = RequestMethod.PUT)
-    @PutMapping(value = "/{origen}/ingresar")
+    @PutMapping(value = "/{origen}/ingreso")
     public ResponseEntity ingresar(@PathVariable String id,
             @RequestBody Tarjeta origen,
             @PathVariable("origen") int destino,
@@ -62,7 +62,7 @@ public class RESTCuenta {
     }
 
     @CrossOrigin(origins = "*", maxAge = 10000, methods = RequestMethod.PUT)
-    @PutMapping("/{origen}/transferir")
+    @PutMapping("/{origen}/transferencia")
     public ResponseEntity transferir(@PathVariable String id,
             @PathVariable @Min(0) int origen,
             @RequestParam @Min(0) int destino,
@@ -74,7 +74,7 @@ public class RESTCuenta {
     }
 
     @CrossOrigin(origins = "*", maxAge = 10000, methods = RequestMethod.PUT)
-    @PutMapping("/{origen}/retirar")
+    @PutMapping("/{origen}/retiro")
     public ResponseEntity retirar(@PathVariable String id,
             @PathVariable @Min(0) int origen,
             @RequestBody Tarjeta destino, @RequestParam float cantidad) {

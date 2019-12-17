@@ -52,14 +52,14 @@ public class RESTUsuario {// implements ServiciosUsuario{
     }
 
     @CrossOrigin(origins = "*", maxAge = 10000, methods = RequestMethod.POST)
-    @PostMapping("/{id}/cc")
+    @PostMapping("/{id}")
     public ResponseEntity crearCuenta(@PathVariable("id") String dni) {
         ujabank.crearCuenta(dni);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @CrossOrigin(origins = "*",methods = RequestMethod.GET, maxAge = 10000)
-    @GetMapping(value = "/{id}/cuentas")
+    @GetMapping(value = "/{id}")
     public ResponseEntity consultarCuentas(@PathVariable("id") String dni) {
         List<?> cuentas = ujabank.consultarCuentas(dni);
 
