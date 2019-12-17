@@ -1,4 +1,4 @@
-Práctica 2 acabada
+Práctica 3 acabada
 
 ## TODO
 - [x] Quitar cliente
