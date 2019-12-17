@@ -5,14 +5,13 @@
  */
 package es.ujaen.dae.ujabank.beans;
 
-import es.dae.ujaen.euroujacoinrate.EuroUJACoinRate;
 import es.ujaen.dae.ujabank.DAO.DAOCuenta;
 import es.ujaen.dae.ujabank.DAO.DAOUsuario;
 import es.ujaen.dae.ujabank.DTO.DTOCuenta;
 import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
-import es.ujaen.dae.ujabank.DTO.DTOUsuario;
 import es.ujaen.dae.ujabank.DTO.Mapper;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
+import es.ujaen.dae.ujabank.config.SeguridadUJABank;
 import es.ujaen.dae.ujabank.entidades.Cuenta;
 import es.ujaen.dae.ujabank.entidades.Transaccion;
 import es.ujaen.dae.ujabank.entidades.Usuario;
@@ -22,7 +21,6 @@ import es.ujaen.dae.ujabank.excepciones.formato.ConceptoIncorrecto;
 import es.ujaen.dae.ujabank.excepciones.formato.CuentaIncorrecta;
 import es.ujaen.dae.ujabank.excepciones.formato.FechaIncorrecta;
 import es.ujaen.dae.ujabank.excepciones.formato.TarjetaIncorrecta;
-import es.ujaen.dae.ujabank.excepciones.formato.TokenIncorrecto;
 import es.ujaen.dae.ujabank.excepciones.formato.UsuarioIncorrecto;
 import es.ujaen.dae.ujabank.interfaces.ServiciosTransacciones;
 import es.ujaen.dae.ujabank.interfaces.ServiciosUsuario;
@@ -30,10 +28,10 @@ import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
@@ -48,24 +46,23 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
     @Autowired
     private DAOCuenta cuentasBanco;
-    private final Map<UUID, Usuario> _tokensActivos;
 
-    private static final EuroUJACoinRate euro_UJACoin = new EuroUJACoinRate();
+    @Autowired
+    private ConversorUJACoin euro_UJACoin;
+    
+    @Autowired
+    private SeguridadUJABank seguridad;
 
     public Banco() {
-        this._tokensActivos = new TreeMap<>();
     }
 
     @Override
-    public boolean ingresar(UUID token, Tarjeta origen, int idDestino, float cantidad) throws IllegalAccessError, InvalidParameterException {
-        if (token == null) {
-            throw new TokenIncorrecto();
-        }
+    public boolean ingresar(String id, Tarjeta origen, int idDestino, float cantidad) throws IllegalAccessError, InvalidParameterException {
 
-        Usuario usuario = this._tokensActivos.get(token);
+        Usuario usuario = this.usuariosBanco.buscar(id);
 
         if (usuario == null) {
-            throw new UsuarioIncorrecto();
+            throw new ErrorAutorizacion();
         }
 
         if (origen == null) {
@@ -92,19 +89,16 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         origen.retirar(cantidad);
 
-        cantidad *= euro_UJACoin.euroToUJACoinToday();
+        cantidad *= euro_UJACoin.euroToUC();
 
         return this.cuentasBanco.ingresar(origen, cuenta, cantidad) != null;
     }
 
     @Override
-    public boolean transferir(UUID token, int idOrigen, int idDestino, float cantidad, String concepto) throws InvalidParameterException, IllegalAccessError {
-        if (token == null) {
-            throw new TokenIncorrecto();
-        }
+    public boolean transferir(String id, int idOrigen, int idDestino, float cantidad, String concepto) throws InvalidParameterException, IllegalAccessError {
 
-        Usuario usuario = this._tokensActivos.get(token);
-
+        Usuario usuario = this.usuariosBanco.buscar(id);
+        
         if (usuario == null) {
             throw new ErrorAutorizacion();
         }
@@ -133,7 +127,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
         if (!usuario.equals(cOrigen.getPropietario())) {
-            throw new ErrorAutorizacion();
+            throw new CuentaNoPerteneceUsuario();
         }
 
         if (cantidad > cOrigen.getSaldo()) {
@@ -144,17 +138,13 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new CuentaIncorrecta();
         }
 
-//        cantidad = EuroUJACoinRate... // no es necesario entre cuentas
         return this.cuentasBanco.transferir(cOrigen, cDestino, cantidad, concepto) != null;
     }
 
     @Override
-    public boolean retirar(UUID token, int idOrigen, Tarjeta destino, float cantidad) throws InvalidParameterException, IllegalAccessError {
-        if (token == null) {
-            throw new TokenIncorrecto();
-        }
+    public boolean retirar(String id, int idOrigen, Tarjeta destino, float cantidad) throws InvalidParameterException, IllegalAccessError {
 
-        Usuario usuario = this._tokensActivos.get(token);
+        Usuario usuario = this.usuariosBanco.buscar(id);
 
         if (usuario == null) {
             throw new ErrorAutorizacion();
@@ -179,7 +169,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
         if (!usuario.equals(cuenta.getPropietario())) {
-            throw new ErrorAutorizacion();
+            throw new CuentaNoPerteneceUsuario();
         }
 
         if (cantidad > cuenta.getSaldo()) {
@@ -188,17 +178,18 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
 
         boolean retiro = this.cuentasBanco.retirar(cuenta, destino, cantidad) != null;
 
-        cantidad *= euro_UJACoin.ujaCoinToEuroToday();
+        cantidad *= euro_UJACoin.UCToEuro();
         destino.ingresar(cantidad);
 
-        //si no se ha ingresado deshacer
         return retiro;
     }
 
     @Override
-    public List<DTOTransaccion> consultar(UUID token, int idCuenta, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
-        if (token == null) {
-            throw new TokenIncorrecto();
+    @Async
+    public CompletableFuture<List<DTOTransaccion>> consultar(String id, int idCuenta, Date inicio, Date fin) throws InvalidParameterException, IllegalAccessError {
+
+        if(id == null){
+            throw new ErrorAutorizacion();
         }
 
         if (idCuenta < 0) {
@@ -217,7 +208,7 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
             throw new FechaFinAnteriorAInicio();
         }
 
-        Usuario usuario = this._tokensActivos.get(token);
+        Usuario usuario = this.usuariosBanco.buscar(id);
 
         if (usuario == null) {
             throw new ErrorAutorizacion();
@@ -230,83 +221,87 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
         }
 
         if (!usuario.equals(cuenta.getPropietario())) {
-            throw new ErrorAutorizacion();
+            throw new CuentaNoPerteneceUsuario();
         }
 
-        List<Transaccion> transacciones = this.cuentasBanco.consultarTransacciones(cuenta, inicio, fin);
+        CompletableFuture<List<Transaccion>> listaTransacciones = this.cuentasBanco.consultarTransacciones(cuenta, inicio, fin);
+
         List<DTOTransaccion> dtoTransacciones = new ArrayList<>();
-        transacciones.forEach((transaccion) -> {
-            dtoTransacciones.add(Mapper.dtoTransaccionMapper(transaccion));
-        });
-        return dtoTransacciones;
+
+        try {
+            List<Transaccion> lt = listaTransacciones.get();
+
+            lt.forEach((transaccion) -> {
+                dtoTransacciones.add(Mapper.dtoTransaccionMapper(transaccion));
+            });
+
+        } catch (InterruptedException | ExecutionException ex) {
+        }
+
+        return CompletableFuture.completedFuture(dtoTransacciones);
     }
 
     @Override
-    public void registrar(DTOUsuario u, String contasena) throws InvalidParameterException {
-        if (u == null) {
+    public boolean registrar(Usuario usuario) throws InvalidParameterException {
+        if (usuario == null) {
             throw new UsuarioIncorrecto();
         }
 
-        if (contasena == null) {
+        if (usuario.getContrasena() == null) {
             throw new ContrasenaIncorrecta();
         }
 
-        if (contasena.isBlank()) {
+        if (usuario.getContrasena().isBlank()) {
             throw new ContrasenaIncorrecta();
         }
 
-        Usuario usuario = Mapper.usuarioMapper(u);
-        usuario.setContrasena(contasena);
-
+        boolean insertado;
+        
         if (!this.usuariosBanco.contiene(usuario)) {
+            usuario.setContrasena(seguridad.encode(usuario.getContrasena()));
             this.usuariosBanco.insertar(usuario);// al insertar si al añadir la cuenta da error lanza excepcion aqui
             Cuenta cuenta = cuentasBanco.crear(0, usuario);
 
-            usuario.addCuenta(cuenta);
+            insertado = usuario.addCuenta(cuenta);
             this.usuariosBanco.actualizar(usuario);
         } else {
             throw new UsuarioIncorrecto();
         }
 
+        return insertado;
     }
 
     @Override
-    public UUID login(DTOUsuario usuarioDTO, String contrasena) throws InvalidParameterException, IllegalAccessError {
-        if (usuarioDTO == null) {
+    public boolean login(Usuario usuarioLogin) throws InvalidParameterException, IllegalAccessError {
+        if (usuarioLogin == null) {
             throw new UsuarioIncorrecto();
         }
 
-        if (contrasena == null) {
+        if (usuarioLogin.getContrasena() == null) {
             throw new ContrasenaIncorrecta();
         }
 
-        if (contrasena.isBlank()) {
+        if (usuarioLogin.getContrasena().isBlank()) {
             throw new ContrasenaIncorrecta();
         }
 
-        Usuario usuario = this.usuariosBanco.buscar(usuarioDTO.getDni());
+        Usuario usuario = this.usuariosBanco.buscar(usuarioLogin.getDni());
 
         if (usuario == null) {
             throw new ErrorAutorizacion();
         }
-        if (!usuario.getContrasena().equals(contrasena)) {
+        
+        if (!this.seguridad.matches(usuarioLogin.getContrasena(), usuario.getContrasena())) {
             throw new ContrasenaIncorrecta();
         }
 
-        UUID token = UUID.randomUUID();
-
-        this._tokensActivos.put(token, usuario);
-
-        return token;
+        return true;
     }
 
     @Override
-    public boolean crearCuenta(UUID token) throws IllegalAccessError {
-        if (token == null) {
-            throw new TokenIncorrecto();
-        }
+    public boolean crearCuenta(String id) throws IllegalAccessError {
 
-        Usuario usuario = this._tokensActivos.get(token);
+        Usuario usuario = this.usuariosBanco.buscar(id);
 
         if (usuario == null) {
             throw new ErrorAutorizacion();
@@ -318,23 +313,22 @@ public class Banco implements ServiciosTransacciones, ServiciosUsuario {
     }
 
     @Override
-    public List<DTOCuenta> consultarCuentas(UUID token) throws IllegalAccessError {
-        if (token == null) {
-            throw new TokenIncorrecto();
-        }
-
-        if (!this._tokensActivos.containsKey(token)) {
-            throw new ErrorAutorizacion();
-        }
-
+    public List<DTOCuenta> consultarCuentas(String id) throws IllegalAccessError {
         ArrayList<DTOCuenta> cuentasDTO = new ArrayList<>();
 
-        List<Cuenta> cuentas = this.usuariosBanco.getCuentas(this._tokensActivos.get(token));
+        List<Cuenta> cuentas = this.usuariosBanco.getCuentas(id);
 
         cuentas.forEach((Cuenta cuenta) -> {
             cuentasDTO.add(Mapper.dtoCuentaMapper(cuenta));
         });
 
         return cuentasDTO;
+    }
+
+    @Override
+    public boolean borrarUsuario(String id) {
+        usuariosBanco.borrar(id);
+        return usuariosBanco.buscar(id) != null;
+
     }
 }

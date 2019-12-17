@@ -9,7 +9,7 @@ import es.ujaen.dae.ujabank.DTO.DTOTransaccion;
 import es.ujaen.dae.ujabank.DTO.Tarjeta;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  *
@@ -17,11 +17,11 @@ import java.util.UUID;
  */
 public interface ServiciosTransacciones {
 
-    public boolean ingresar(UUID token, Tarjeta origen, int idDestino, float cantidad);
+    public boolean ingresar(String id, Tarjeta origen, int idDestino, float cantidad);
 
-    public boolean transferir(UUID token, int idOrigen, int idDestino, float cantidad, String concepto);
+    public boolean transferir(String id, int idOrigen, int idDestino, float cantidad, String concepto);
 
-    public boolean retirar(UUID token, int idOrigen, Tarjeta destino, float cantidad);
+    public boolean retirar(String id, int idOrigen, Tarjeta destino, float cantidad);
 
-    public List<DTOTransaccion> consultar(UUID token, int idCuenta, Date inicio, Date fin);
+    public CompletableFuture<List<DTOTransaccion>> consultar(String id, int idCuenta, Date inicio, Date fin);
 }

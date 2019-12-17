@@ -30,6 +30,8 @@ public class Mapper {
         u.setNombre(usuario.getNombre());
         u.setTelefono(usuario.getTelefono());
         u.setfNacimiento(usuario.getfNacimiento());
+        u.setContrasena(usuario.getContrasena());
+
         return u;
     }
 
@@ -84,7 +86,6 @@ public class Mapper {
 
         }
         return dtoTransaccion;
-
     }
 
 }

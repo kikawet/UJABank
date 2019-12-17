@@ -19,6 +19,7 @@ public class DTOUsuario {
     private Date _fNacimiento = new Date();
     private String _telefono;
     private String _email;
+    private String _contrasena;
 
     public String getNombre() {
         return _nombre;
@@ -66,6 +67,14 @@ public class DTOUsuario {
 
     public void setEmail(String email) {
         this._email = email;
+    }
+
+    public String getContrasena() {
+        return _contrasena;
+    }
+
+    public void setContrasena(String _contrasena) {
+        this._contrasena = _contrasena;
     }
 
 }

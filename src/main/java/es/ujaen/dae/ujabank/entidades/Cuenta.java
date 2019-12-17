@@ -37,9 +37,7 @@ public class Cuenta implements Serializable {
     @JoinColumn(name = "propietario")
     Usuario propietario;
 
-    @JoinTable(name = "transacciones"
-    //            ,schema = "aptatas"
-    )//marcar el id es para confirmar 
+    @JoinTable(name = "transacciones")
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
     /*No se puede indexar por fecha este historial pero se puede @OrderColumn
     que guarda en la DB el orden de la lista, por ahora solo hay index en transaccion*/

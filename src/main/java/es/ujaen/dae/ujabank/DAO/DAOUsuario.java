@@ -25,9 +25,9 @@ public class DAOUsuario extends DAOGenerico<Usuario> {
         return em.contains(usuario);
     }
 
-    @Cacheable(value = "cacheCuentasUsuario", key = "#usuario.getID()")
-    public List<Cuenta> getCuentas(Usuario usuario) {
-        usuario = this.buscar(usuario.getID());
+    @Cacheable(value = "cacheCuentasUsuario", key = "#id")
+    public List<Cuenta> getCuentas(String id) {
+        Usuario usuario = this.buscar(id);
         usuario.getCuentas().forEach((Cuenta cuenta) -> {
         });
         return usuario.getCuentas();

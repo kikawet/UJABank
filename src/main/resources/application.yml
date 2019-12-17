@@ -11,6 +11,17 @@ spring.datasource.password: ujabankpass
 spring.jpa.show-sql: false
 spring.jpa.hibernate.ddl-auto: none
 spring.jpa.properties.hibernate.dialect: org.hibernate.dialect.DerbyTenSevenDialect
+spring.jpa.open-in-view: true #por defecto es true pero al lanzar da warning
 
 #Cache config
 spring.cache.ehcache.config: classpath:ehcache.xml
+
+#Path base de la REST API 
+server.servlet.context-path: /ujabank
+
+#HTTPS config
+server.port: 8080
+server.ssl.key-store: classpath:ujabankcert.p12
+server.ssl.key-store-password: 123456
+server.ssl.keyStoreType: PKCS12
+server.ssl.keyAlias: tomcat

@@ -1,8 +1,14 @@
 Práctica 2 acabada
 
 ## TODO
-- [x] mappear
-- [x] aislamiento
-- [x] cache
-- [x] copiar menu
-- [x] limpiar
+- [x] Quitar cliente
+- [x] RESTusuario
+- [x] RESTcuenta
+- [x] Autentificación basic
+- [x] Usar API de conversión
+
+- [x] Usar HTTPS
+- [ ] Crear cliente web
+
+- [x] Soporta CORS
+- [x] ~~Gestor de Tokens usando AOP y validaciones~~

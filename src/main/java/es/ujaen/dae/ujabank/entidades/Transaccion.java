@@ -61,46 +61,10 @@ public abstract class Transaccion implements Serializable {
     public abstract DTOTransaccion.TIPO getTipo();
 
     public boolean beforeFecha(Date fecha) {
-//        Calendar Cfecha = Calendar.getInstance(), Cinicio = Calendar.getInstance();
-//
-//        Cfecha.setTime(this.getFecha());
-//        Cfecha.set(Calendar.HOUR_OF_DAY, 0);
-//        Cfecha.set(Calendar.MINUTE, 0);
-//        Cfecha.set(Calendar.SECOND, 0);
-//        Cfecha.set(Calendar.MILLISECOND, 0);
-//
-//        Cinicio.setTime(fecha);
-//        Cinicio.set(Calendar.HOUR_OF_DAY, 0);
-//        Cinicio.set(Calendar.MINUTE, 0);
-//        Cinicio.set(Calendar.SECOND, 0);
-//        Cinicio.set(Calendar.MILLISECOND, 0);
-//
-//        return (Cfecha.equals(Cinicio) || Cfecha.before(fecha));
         return this.getFecha().before(fecha);
     }
 
     public boolean entreFechas(Date inicio, Date fin) {
-//        Calendar Cfecha = Calendar.getInstance(), Cinicio = Calendar.getInstance(), Cfin = Calendar.getInstance();
-//
-//        Cfecha.setTime(this.getFecha());
-//        Cfecha.set(Calendar.HOUR_OF_DAY, 0);
-//        Cfecha.set(Calendar.MINUTE, 0);
-//        Cfecha.set(Calendar.SECOND, 0);
-//        Cfecha.set(Calendar.MILLISECOND, 0);
-//
-//        Cinicio.setTime(inicio);
-//        Cinicio.set(Calendar.HOUR_OF_DAY, 0);
-//        Cinicio.set(Calendar.MINUTE, 0);
-//        Cinicio.set(Calendar.SECOND, 0);
-//        Cinicio.set(Calendar.MILLISECOND, 0);
-//
-//        Cfin.setTime(fin);
-//        Cfin.set(Calendar.HOUR_OF_DAY, 0);
-//        Cfin.set(Calendar.MINUTE, 0);
-//        Cfin.set(Calendar.SECOND, 0);
-//        Cfin.set(Calendar.MILLISECOND, 0);
-//
-//        return (Cfecha.equals(Cinicio) || Cfecha.equals(Cfin) || Cfecha.after(inicio) && Cfecha.before(fin));
         return this.getFecha().after(inicio) && this.getFecha().before(fin);
     }
 
